@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人才检索 - 智能查询</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .nav-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: #fff;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-left h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .nav-tab {
+            padding: 6px 16px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-tab.active {
+            background: #fff;
+            color: #1e3a5f;
+            font-weight: 600;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            font-size: 13px;
+        }
+
+        /* 主体内容区 */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+
+        /* 侧边栏切换按钮 */
+        .sidebar-toggle {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 60px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            z-index: 100;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-toggle:hover {
+            background: #f5f7fa;
+            color: #2c5c97;
+        }
+
+        .sidebar-toggle.collapsed {
+            left: 0;
+        }
+
+        /* 左侧标签筛选面板 */
+        .left-panel {
+            width: 320px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.3s ease;
+            z-index: 50;
+        }
+
+        .left-panel.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .panel-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px 36px 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: #2c5c97;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: #1a3d6e;
+        }
+
+        /* 标签分类 */
+        .tag-categories {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .tag-category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f5f7fa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .category-title:hover {
+            background: #e8eaed;
+        }
+
+        .category-title span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .category-toggle {
+            font-size: 12px;
+            color: #999;
+            transition: transform 0.2s;
+        }
+
+        .category-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px;
+        }
+
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #f5f7fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-item:hover {
+            background: #e6f0ff;
+            border-color: #2c5c97;
+            color: #2c5c97;
+        }
+
+        .tag-item.selected {
+            background: #2c5c97;
+            border-color: #2c5c97;
+            color: #fff;
+        }
+
+        .tag-item input {
+            display: none;
+        }
+
+        .tag-checkbox {
+            width: 14px;
+            height: 14px;
+            border: 1px solid #999;
+            border-radius: 3px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .tag-item.selected .tag-checkbox {
+            background: #2c5c97;
+            border-color: #2c5c97;
+        }
+
+        .tag-item.selected .tag-checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            color: #fff;
+        }
+
+        /* 搜索按钮 */
+        .search-action {
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5c97 0%, #1a3d6e 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: #f5f7fa;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaed;
+        }
+
+        /* 右侧内容区 */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f5f7fa;
+            min-width: 0;
+            transition: width 0.3s ease;
+        }
+
+        /* 搜索头部 */
+        .search-header {
+            background: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .ai-search-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ai-search-container input {
+            width: 100%;
+            padding: 14px 60px 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 40px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .ai-search-container input:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .ai-search-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #2c5c97 0%, #1a3d6e 100%);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-search-btn:hover {
+            opacity: 0.9;
+        }
+
+        .ai-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            background: #fff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .result-count {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .selected-count {
+            font-size: 13px;
+            color: #2c5c97;
+            font-weight: 500;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-actions .btn {
+            flex: none;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .btn-compare {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: #fff;
+        }
+
+        .btn-compare:hover {
+            opacity: 0.9;
+        }
+
+        .btn-compare:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 人员列表 */
+        .person-list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .table-scroll-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .table-scroll-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-scroll-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .person-table {
+            width: 100%;
+            min-width: 1200px;
+            background: #fff;
+            border-radius: 8px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .person-table th,
+        .person-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .person-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .person-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .person-table tbody tr.selected {
+            background: #e8f0fe;
+        }
+
+        .person-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            flex-wrap: nowrap;
+            gap: 4px;
+            overflow-x: auto;
+            padding: 2px 0;
+            max-width: 150px;
+        }
+
+        .tag-badge::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .tag-badge::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tag-badge::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 2px;
+        }
+
+        .tag-badge span {
+            flex-shrink: 0;
+            padding: 2px 8px;
+            background: #e6f0ff;
+            color: #2c5c97;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .action-btn.resume {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .action-btn.resume:hover {
+            background: #dcedc8;
+        }
+
+        .action-btn.profile {
+            background: #e6f0ff;
+            color: #2c5c97;
+        }
+
+        .action-btn.profile:hover {
+            background: #cce0ff;
+        }
+
+        .action-btn.archive {
+            background: #fff3e0;
+            color: #f39c12;
+        }
+
+        .action-btn.archive:hover {
+            background: #ffe0b2;
+        }
+
+        .action-btn:disabled {
+            background: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 分页 */
+        .pagination {
+            padding: 16px 20px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .pagination button {
+            min-width: 80px;
+            height: 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: #2c5c97;
+            color: #2c5c97;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
+        }
+
+        .pagination .page-info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .pagination .page-jump {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination .page-jump input {
+            width: 60px;
+            height: 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .pagination .page-jump input:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .pagination .jump-btn {
+            min-width: 60px;
+            background: #2c5c97;
+            color: #fff;
+            border-color: #2c5c97;
+        }
+
+        .pagination .jump-btn:hover {
+            background: #1a3d6e;
+            border-color: #1a3d6e;
+            color: #fff;
+        }
+
+        /* 人才对比弹窗 */
+        .compare-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .compare-modal-overlay.show {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .compare-modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .compare-modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .compare-modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .compare-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .compare-cards {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 16px;
+        }
+
+        .compare-card {
+            flex: 0 0 280px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .card-header {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .card-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0 auto 12px;
+        }
+
+        .card-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-position {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .info-value {
+            font-size: 12px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .card-tags {
+            margin-top: 16px;
+        }
+
+        .card-tags .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .card-tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .card-tag {
+            padding: 3px 8px;
+            background: #e6f0ff;
+            color: #2c5c97;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+                max-height: 300px;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+
+            .person-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .person-table th,
+            .person-table td {
+                white-space: nowrap;
+            }
+
+            .compare-cards {
+                flex-direction: column;
+            }
+
+            .compare-card {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="nav-header">
+        <div class="nav-left">
+            <h1>人才检索</h1>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">管理员</div>
+        </div>
+    </div>
+
+    <!-- 侧边栏切换按钮 -->
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+        <span>◀</span>
+    </button>
+
+    <!-- 主体内容 -->
+    <div class="main-container">
+        <!-- 左侧标签筛选面板 -->
+        <div class="left-panel" id="leftPanel">
+            <div class="panel-header">
+                <h3>标签筛选</h3>
+            </div>
+            
+            <div class="tag-categories" id="tagCategories">
+                <!-- 标签分类将通过JS动态生成 -->
+            </div>
+            
+            <div class="search-action">
+                <button class="btn btn-secondary" onclick="clearFilters()">清除筛选</button>
+                <button class="btn btn-primary" onclick="applyFilters()">检索</button>
+            </div>
+        </div>
+
+        <!-- 右侧内容区 -->
+        <div class="right-panel">
+            <!-- AI搜索头部 -->
+            <div class="search-header">
+                <div class="ai-search-container">
+                    <input type="text" id="aiSearchInput" placeholder="输入自然语言查询，如：35岁以下博士学历的年轻干部" />
+                    <button class="ai-search-btn" onclick="aiSearch()">
+                        <span>🤖</span> AI检索
+                    </button>
+                </div>
+                <div class="ai-hint">支持自然语言搜索，基于我行AI能力对员工数据进行智能分析</div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <span class="result-count" id="resultCount">共 0 条记录</span>
+                    <span class="selected-count" id="selectedCount">已选 0 人</span>
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666;">
+                        <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" /> 全选
+                    </label>
+                </div>
+                <div class="toolbar-actions">
+                    <button class="btn btn-compare" id="compareBtn" onclick="openCompareModal()" disabled>
+                        <span>🔄</span> 人才对比
+                    </button>
+                    <button class="btn btn-secondary">
+                        <span>📊</span> 导出Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- 人员列表 -->
+            <div class="person-list-container">
+                <div class="table-scroll-wrapper">
+                    <table class="person-table" id="personTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" id="headerCheckbox" onclick="toggleSelectAll()" />
+                                </th>
+                                <th>工号</th>
+                                <th>姓名</th>
+                                <th>单位</th>
+                                <th>部门</th>
+                                <th>部室</th>
+                                <th>岗位</th>
+                                <th>性别</th>
+                                <th>年龄</th>
+                                <th>最高学历</th>
+                                <th>婚姻状况</th>
+                                <th>员工类别</th>
+                                <th>政治面貌</th>
+                                <th>标签</th>
+                                <th style="width: 140px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="personTableBody">
+                            <!-- 人员数据将通过JS动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" id="pagination">
+                <button onclick="firstPage()" id="firstBtn" disabled>首页</button>
+                <button onclick="prevPage()" id="prevBtn" disabled>上一页</button>
+                <span class="page-info" id="pageInfo">第 1 / 1 页</span>
+                <button onclick="nextPage()" id="nextBtn">下一页</button>
+                <button onclick="lastPage()" id="lastBtn">末页</button>
+                <div class="page-jump">
+                    <span>跳转到</span>
+                    <input type="number" id="jumpPage" min="1" value="1" />
+                    <button class="jump-btn" onclick="jumpToPage()">跳转</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人才对比弹窗 -->
+    <div class="compare-modal-overlay" id="compareModal">
+        <div class="compare-modal">
+            <div class="compare-modal-header">
+                <h3>人才对比分析</h3>
+                <span class="modal-close" onclick="closeCompareModal()">&times;</span>
+            </div>
+            <div class="compare-modal-body">
+                <div class="compare-cards" id="compareCards">
+                    <!-- 对比卡片将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 侧边栏切换函数
+        function toggleSidebar() {
+            const leftPanel = document.getElementById('leftPanel');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            
+            if (leftPanel.classList.contains('collapsed')) {
+                leftPanel.classList.remove('collapsed');
+                toggleBtn.innerHTML = '<span>◀</span>';
+                toggleBtn.style.left = '320px';
+            } else {
+                leftPanel.classList.add('collapsed');
+                toggleBtn.innerHTML = '<span>▶</span>';
+                toggleBtn.style.left = '0';
+            }
+        }
+
+        // 标签分类数据
+        const tagCategories = [
+            {
+                name: '海外学习经历',
+                tags: ['海外学习经历', '海归硕士', '海归博士', '海外工作经历']
+            },
+            {
+                name: '高校档次',
+                tags: ['985', '211', '普通高校']
+            },
+            {
+                name: '项目经验',
+                tags: ['项目经理', '新项目骨干']
+            },
+            {
+                name: '科研水平',
+                tags: ['国际化科研人才', '高潜力项目人才', '国内科研骨干']
+            },
+            {
+                name: '激励层次',
+                tags: []
+            },
+            {
+                name: '奖励层次',
+                tags: ['高级奖励获得者', '中级奖励获得者', '初级奖励获得者']
+            },
+            {
+                name: '特殊贡献',
+                tags: ['特殊贡献']
+            },
+            {
+                name: '年龄阶段',
+                tags: ['80后', '85后', '90后', '95后']
+            },
+            {
+                name: '学历层次',
+                tags: ['本科', '硕士', '博士']
+            },
+            {
+                name: '政治面貌',
+                tags: ['中共党员', '共青团员', '群众']
+            },
+            {
+                name: '员工类别',
+                tags: ['管理岗', '专业技术岗', '操作岗']
+            }
+        ];
+
+        // 人员数据
+        const personData = [
+            { id: 1, empNo: 'G001', name: '张军', unit: '总行', department: '集团总部', office: '董事会办公室', position: '董事长', gender: '男', age: 38, education: '博士研究生', marital: '已婚', empType: '管理岗', political: '中共党员', tags: ['85后', '博士', '中共党员', '高级奖励获得者'], isCadre: true },
+            { id: 2, empNo: 'G002', name: '李明', unit: '总行', department: '人力资源部', office: '干部管理处', position: '处长', gender: '男', age: 42, education: '硕士研究生', marital: '已婚', empType: '管理岗', political: '中共党员', tags: ['80后', '硕士', '中共党员'], isCadre: true },
+            { id: 3, empNo: 'G003', name: '王芳', unit: '上海分行', department: '公司业务部', office: '大客户中心', position: '总经理', gender: '女', age: 35, education: '硕士研究生', marital: '未婚', empType: '管理岗', political: '中共党员', tags: ['85后', '硕士', '中共党员', '项目经验丰富'], isCadre: true },
+            { id: 4, empNo: 'G004', name: '陈伟', unit: '北京分行', department: '风险管理部', office: '信用审批处', position: '副处长', gender: '男', age: 32, education: '博士研究生', marital: '已婚', empType: '专业技术岗', political: '中共党员', tags: ['90后', '博士', '中共党员', '科研骨干'], isCadre: true },
+            { id: 5, empNo: 'G005', name: '刘洋', unit: '深圳分行', department: '金融科技部', office: '开发一部', position: '技术经理', gender: '男', age: 29, education: '本科', marital: '未婚', empType: '专业技术岗', political: '共青团员', tags: ['95后', '本科', '共青团员'], isCadre: false },
+            { id: 6, empNo: 'G006', name: '赵静', unit: '总行', department: '财务部', office: '预算管理处', position: '主管', gender: '女', age: 31, education: '硕士研究生', marital: '已婚', empType: '专业技术岗', political: '中共党员', tags: ['90后', '硕士', '中共党员'], isCadre: false },
+            { id: 7, empNo: 'G007', name: '孙磊', unit: '广州分行', department: '零售业务部', office: '个人信贷处', position: '经理', gender: '男', age: 36, education: '本科', marital: '已婚', empType: '管理岗', political: '中共党员', tags: ['85后', '本科', '中共党员'], isCadre: true },
+            { id: 8, empNo: 'G008', name: '周婷', unit: '成都分行', department: '运营管理部', office: '流程优化处', position: '副经理', gender: '女', age: 30, education: '硕士研究生', marital: '未婚', empType: '专业技术岗', political: '群众', tags: ['90后', '硕士', '群众'], isCadre: false },
+            { id: 9, empNo: 'G009', name: '吴强', unit: '总行', department: '战略规划部', office: '规划研究处', position: '研究员', gender: '男', age: 33, education: '博士研究生', marital: '已婚', empType: '专业技术岗', political: '中共党员', tags: ['90后', '博士', '中共党员', '国际化科研人才'], isCadre: true },
+            { id: 10, empNo: 'G010', name: '郑洁', unit: '杭州分行', department: '营业部', office: '客户服务中心', position: '主任', gender: '女', age: 34, education: '本科', marital: '已婚', empType: '管理岗', political: '中共党员', tags: ['85后', '本科', '中共党员'], isCadre: true },
+            { id: 11, empNo: 'G011', name: '黄伟', unit: '南京分行', department: '投资银行部', office: '并购重组处', position: '高级经理', gender: '男', age: 37, education: '硕士研究生', marital: '已婚', empType: '专业技术岗', political: '中共党员', tags: ['85后', '硕士', '中共党员', '海外学习经历'], isCadre: false },
+            { id: 12, empNo: 'G012', name: '林娜', unit: '武汉分行', department: '人力资源部', office: '培训中心', position: '培训师', gender: '女', age: 28, education: '硕士研究生', marital: '未婚', empType: '专业技术岗', political: '共青团员', tags: ['95后', '硕士', '共青团员'], isCadre: false }
+        ];
+
+        let currentPage = 1;
+        const pageSize = 10;
+        let selectedTags = [];
+        let selectedPersons = new Set();
+
+        // 初始化标签面板
+        function initTagPanel() {
+            const container = document.getElementById('tagCategories');
+            tagCategories.forEach((category, categoryIndex) => {
+                if (category.tags.length === 0) return;
+                
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'tag-category';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'category-title';
+                titleDiv.innerHTML = `
+                    <span>${category.name}</span>
+                    <span class="category-toggle">▼</span>
+                `;
+                titleDiv.onclick = () => toggleCategory(categoryIndex);
+                categoryDiv.appendChild(titleDiv);
+                
+                const tagList = document.createElement('div');
+                tagList.className = 'tag-list';
+                category.tags.forEach(tag => {
+                    const tagItem = document.createElement('label');
+                    tagItem.className = 'tag-item';
+                    tagItem.innerHTML = `
+                        <span class="tag-checkbox"></span>
+                        <span>${tag}</span>
+                    `;
+                    tagItem.onclick = (e) => {
+                        e.stopPropagation();
+                        toggleTag(tag, tagItem);
+                    };
+                    tagList.appendChild(tagItem);
+                });
+                categoryDiv.appendChild(tagList);
+                
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        // 切换分类展开/收起
+        function toggleCategory(index) {
+            const categories = document.querySelectorAll('.tag-category');
+            const category = categories[index];
+            const toggle = category.querySelector('.category-toggle');
+            const tagList = category.querySelector('.tag-list');
+            
+            if (tagList.style.display === 'none' || tagList.style.display === '') {
+                tagList.style.display = 'flex';
+                toggle.classList.add('expanded');
+            } else {
+                tagList.style.display = 'none';
+                toggle.classList.remove('expanded');
+            }
+        }
+
+        // 切换标签选择
+        function toggleTag(tag, element) {
+            if (selectedTags.includes(tag)) {
+                selectedTags = selectedTags.filter(t => t !== tag);
+                element.classList.remove('selected');
+            } else {
+                selectedTags.push(tag);
+                element.classList.add('selected');
+            }
+        }
+
+        // 清除筛选
+        function clearFilters() {
+            selectedTags = [];
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.getElementById('aiSearchInput').value = '';
+            renderPersonList();
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            currentPage = 1;
+            renderPersonList();
+        }
+
+        // AI搜索
+        function aiSearch() {
+            const query = document.getElementById('aiSearchInput').value;
+            if (!query.trim()) return;
+            
+            alert(`正在使用AI分析查询："${query}"\n\n此功能需要对接我行AI能力，对人力系统已有员工数据进行训练后使用。`);
+            selectedTags = [];
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            renderPersonList();
+        }
+
+        // 筛选人员数据
+        function filterPersons() {
+            if (selectedTags.length === 0) {
+                return personData;
+            }
+            return personData.filter(person => {
+                return selectedTags.some(tag => person.tags.includes(tag));
+            });
+        }
+
+        // 渲染人员列表
+        function renderPersonList() {
+            const filteredData = filterPersons();
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            const tbody = document.getElementById('personTableBody');
+            tbody.innerHTML = '';
+            
+            pageData.forEach(person => {
+                const row = document.createElement('tr');
+                row.dataset.id = person.id;
+                row.className = selectedPersons.has(person.id) ? 'selected' : '';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'person-checkbox';
+                checkbox.checked = selectedPersons.has(person.id);
+                checkbox.onclick = () => togglePersonSelect(person.id, row);
+                
+                row.innerHTML = `
+                    <td>${checkbox.outerHTML}</td>
+                    <td>${person.empNo}</td>
+                    <td>${person.name}</td>
+                    <td>${person.unit}</td>
+                    <td>${person.department}</td>
+                    <td>${person.office}</td>
+                    <td>${person.position}</td>
+                    <td>${person.gender}</td>
+                    <td>${person.age}</td>
+                    <td>${person.education}</td>
+                    <td>${person.marital}</td>
+                    <td>${person.empType}</td>
+                    <td>${person.political}</td>
+                    <td><div class="tag-badge">${person.tags.map(t => `<span>${t}</span>`).join('')}</div></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn resume" onclick="viewResume(${person.id})">📋 简历</button>
+                            ${person.isCadre ? `<button class="action-btn profile" onclick="viewProfile(${person.id})">👤 画像</button>` : ''}
+                            <button class="action-btn archive" onclick="viewArchive(${person.id})">📁 档案</button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // 更新分页
+            document.getElementById('resultCount').textContent = `共 ${filteredData.length} 条记录`;
+            document.getElementById('pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页`;
+            document.getElementById('jumpPage').value = currentPage;
+            document.getElementById('firstBtn').disabled = currentPage === 1;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+            document.getElementById('lastBtn').disabled = currentPage >= totalPages;
+            document.getElementById('selectAll').checked = selectedPersons.size === filteredData.length && filteredData.length > 0;
+            
+            updateSelectedCount();
+        }
+
+        // 切换人员选择
+        function togglePersonSelect(id, row) {
+            if (selectedPersons.has(id)) {
+                selectedPersons.delete(id);
+                row.classList.remove('selected');
+            } else {
+                selectedPersons.add(id);
+                row.classList.add('selected');
+            }
+            updateSelectedCount();
+        }
+
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const filteredData = filterPersons();
+            const isChecked = document.getElementById('selectAll').checked;
+            
+            if (isChecked) {
+                filteredData.forEach(person => selectedPersons.add(person.id));
+            } else {
+                selectedPersons.clear();
+            }
+            
+            document.querySelectorAll('.person-checkbox').forEach((checkbox, index) => {
+                checkbox.checked = isChecked;
+            });
+            
+            document.querySelectorAll('#personTableBody tr').forEach(row => {
+                row.classList.toggle('selected', isChecked);
+            });
+            
+            updateSelectedCount();
+        }
+
+        // 更新已选人数
+        function updateSelectedCount() {
+            const count = selectedPersons.size;
+            document.getElementById('selectedCount').textContent = `已选 ${count} 人`;
+            document.getElementById('compareBtn').disabled = count < 2;
+        }
+
+        // 首页
+        function firstPage() {
+            if (currentPage > 1) {
+                currentPage = 1;
+                renderPersonList();
+            }
+        }
+
+        // 上一页
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPersonList();
+            }
+        }
+
+        // 下一页
+        function nextPage() {
+            const filteredData = filterPersons();
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPersonList();
+            }
+        }
+
+        // 末页
+        function lastPage() {
+            const filteredData = filterPersons();
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage = totalPages;
+                renderPersonList();
+            }
+        }
+
+        // 跳转到指定页
+        function jumpToPage() {
+            const jumpInput = document.getElementById('jumpPage');
+            const targetPage = parseInt(jumpInput.value);
+            const filteredData = filterPersons();
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            
+            if (targetPage >= 1 && targetPage <= totalPages && targetPage !== currentPage) {
+                currentPage = targetPage;
+                renderPersonList();
+            } else {
+                jumpInput.value = currentPage;
+            }
+        }
+
+        // 查看简历
+        function viewResume(id) {
+            const person = personData.find(p => p.id === id);
+            if (person) {
+                alert(`查看 ${person.name} 的简历\n\n工号：${person.empNo}\n岗位：${person.position}\n部门：${person.department}\n学历：${person.education}`);
+            }
+        }
+
+        // 查看干部画像
+        function viewProfile(id) {
+            const person = personData.find(p => p.id === id);
+            if (person) {
+                window.open('干部画像.html', '_blank');
+            }
+        }
+
+        // 查看干部档案
+        function viewArchive(id) {
+            const person = personData.find(p => p.id === id);
+            if (person) {
+                window.open('干部培养档案.html', '_blank');
+            }
+        }
+
+        // 打开人才对比弹窗
+        function openCompareModal() {
+            const modal = document.getElementById('compareModal');
+            const cardsContainer = document.getElementById('compareCards');
+            cardsContainer.innerHTML = '';
+            
+            selectedPersons.forEach(id => {
+                const person = personData.find(p => p.id === id);
+                if (person) {
+                    const card = document.createElement('div');
+                    card.className = 'compare-card';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="card-avatar">${person.name.charAt(0)}</div>
+                            <div class="card-name">${person.name}</div>
+                            <div class="card-position">${person.position}</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row"><span class="info-label">工号</span><span class="info-value">${person.empNo}</span></div>
+                            <div class="info-row"><span class="info-label">单位</span><span class="info-value">${person.unit}</span></div>
+                            <div class="info-row"><span class="info-label">部门</span><span class="info-value">${person.department}</span></div>
+                            <div class="info-row"><span class="info-label">部室</span><span class="info-value">${person.office}</span></div>
+                            <div class="info-row"><span class="info-label">性别</span><span class="info-value">${person.gender}</span></div>
+                            <div class="info-row"><span class="info-label">年龄</span><span class="info-value">${person.age}</span></div>
+                            <div class="info-row"><span class="info-label">学历</span><span class="info-value">${person.education}</span></div>
+                            <div class="info-row"><span class="info-label">婚姻状况</span><span class="info-value">${person.marital}</span></div>
+                            <div class="info-row"><span class="info-label">员工类别</span><span class="info-value">${person.empType}</span></div>
+                            <div class="info-row"><span class="info-label">政治面貌</span><span class="info-value">${person.political}</span></div>
+                            <div class="card-tags">
+                                <div class="section-title">标签</div>
+                                <div class="card-tag-list">${person.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+                            </div>
+                        </div>
+                    `;
+                    cardsContainer.appendChild(card);
+                }
+            });
+            
+            modal.classList.add('show');
+        }
+
+        // 关闭对比弹窗
+        function closeCompareModal() {
+            document.getElementById('compareModal').classList.remove('show');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initTagPanel();
+            renderPersonList();
+        });
+    </script>
+</body>
+</html>

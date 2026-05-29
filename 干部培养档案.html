@@ -1,0 +1,2933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>干部培养档案管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .nav-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: #fff;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-left h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .nav-tab {
+            padding: 6px 16px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-tab.active {
+            background: #fff;
+            color: #1e3a5f;
+            font-weight: 600;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            font-size: 13px;
+        }
+
+        /* 主体内容区 */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+
+        /* 左侧人员列表 */
+        .left-panel {
+            width: 320px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px 36px 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        .search-btn:hover {
+            color: #2c5c97;
+        }
+
+        .org-tree-btn {
+            padding: 8px 12px;
+            background: #f5f7fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .org-tree-btn::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border: 2px solid #999;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .org-tree-btn::after {
+            content: '';
+            width: 6px;
+            height: 0;
+            border-top: 2px solid #999;
+            position: absolute;
+            margin-left: -10px;
+            margin-top: 4px;
+        }
+
+        .org-tree-btn:hover {
+            background: #e8eaed;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .filter-tag {
+            padding: 4px 10px;
+            background: #e6f0ff;
+            color: #2c5c97;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .filter-tag:hover {
+            background: #cce0ff;
+        }
+
+        .filter-tag .remove {
+            font-size: 10px;
+        }
+
+        /* 人员列表 */
+        .person-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .person-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .person-item:hover {
+            background: #fafafa;
+        }
+
+        .person-item.active {
+            background: #e6f0ff;
+            border-left: 3px solid #2c5c97;
+        }
+
+        .person-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .person-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .person-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .person-dept {
+            font-size: 12px;
+            color: #999;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .person-count {
+            padding: 8px 16px;
+            background: #fafafa;
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+        }
+
+        /* 组织架构搜索栏 */
+        .org-search-bar {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .org-search-bar input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+
+        .org-search-bar input:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .org-tree-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        /* 右侧档案目录 */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .panel-toolbar {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toolbar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5c97 0%, #1a3d6e 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f5f7fa;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaed;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* 上传弹窗 */
+        .upload-modal {
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        /* 档案目录树 */
+        .archive-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .tree-container {
+            max-width: 100%;
+        }
+
+        .tree-node {
+            margin-bottom: 4px;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 12px;
+        }
+
+        .tree-item:hover {
+            background: #f5f7fa;
+        }
+
+        .tree-item.active {
+            background: #e6f0ff;
+        }
+
+        .tree-item.folder {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .tree-item.file {
+            color: #666;
+            font-size: 13px;
+            padding-left: 32px;
+        }
+
+        .file-checkbox {
+            margin: 0 6px 0 0;
+            width: 16px;
+            height: 16px;
+        }
+
+        .tree-icon {
+            margin-right: 8px;
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .tree-expand {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 4px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .tree-expand:hover {
+            color: #2c5c97;
+        }
+
+        .tree-expand.expanded::before {
+            content: '▼';
+            color: #2c5c97;
+        }
+
+        .tree-expand.collapsed::before {
+            content: '▶';
+            color: #666;
+        }
+
+        .tree-indent {
+            display: inline-block;
+            width: 16px;
+        }
+
+        .tree-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tree-name {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tree-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: #999;
+            min-width: 140px;
+        }
+
+
+
+        .tree-actions {
+            display: flex;
+            gap: 8px;
+            width: 80px;
+            justify-content: flex-end;
+        }
+
+        .action-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .action-icon:hover {
+            color: #2c5c97;
+        }
+
+        /* 档案目录头部 */
+        .archive-tree-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: #f5f7fa;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .archive-tree-header .header-name {
+            flex: 1;
+            padding-left: 20px;
+        }
+
+        .archive-tree-header .header-info {
+            min-width: 140px;
+        }
+
+
+
+        .archive-tree-header .header-checkbox {
+            width: 30px;
+            text-align: center;
+        }
+
+
+
+        .archive-tree-header .header-actions {
+            width: 80px;
+            text-align: center;
+        }
+
+        /* 右键菜单 */
+        .context-menu-item {
+            padding: 8px 20px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .context-menu-item:hover {
+            background: #f5f7fa;
+        }
+
+        /* 二级目录多输入框 */
+        .subfolder-input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .subfolder-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .subfolder-input:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .add-subfolder-btn {
+            padding: 0 16px;
+            background: #2c5c97;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .add-subfolder-btn:hover {
+            background: #1a3d6e;
+        }
+
+        /* hover提示 */
+        .tooltip::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 8px;
+            background: #333;
+            color: #fff;
+            font-size: 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+            z-index: 100;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        .tooltip:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            margin-bottom: 3px;
+            z-index: 100;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 分页 */
+        .pagination {
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fafafa;
+        }
+
+        .pagination button {
+            min-width: 32px;
+            height: 32px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: #2c5c97;
+            color: #2c5c97;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
+        }
+
+        .pagination .current-page {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c5c97;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .pagination .page-jump {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+            font-size: 12px;
+        }
+
+        .pagination .page-jump span {
+            white-space: nowrap;
+        }
+
+        .pagination .page-jump input {
+            width: 40px;
+            height: 26px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0 6px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .pagination .page-jump input:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .pagination .page-jump .jump-btn {
+            padding: 0 12px;
+            height: 26px;
+            background: #2c5c97;
+            color: #fff;
+            border-color: #2c5c97;
+            font-size: 12px;
+        }
+
+        .pagination .page-jump .jump-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* 批量导出弹窗样式 */
+        .batch-export-modal {
+            width: 80%;
+            max-width: 1000px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .batch-export-modal .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .search-container .search-btn {
+            padding: 8px 24px;
+        }
+
+        .person-table-container {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .person-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .person-table th,
+        .person-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .person-table th {
+            background: #f5f7fa;
+            font-weight: 600;
+            color: #666;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .person-table tbody tr:hover {
+            background: #f5f7fa;
+        }
+
+        .person-table tbody tr.selected {
+            background: #e8f0fe;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* 表单样式 */
+        .form-item {
+            margin-bottom: 16px;
+        }
+
+        .form-item label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .form-item input,
+        .form-item select,
+        .form-item textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-item input:focus,
+        .form-item select:focus,
+        .form-item textarea:focus {
+            outline: none;
+            border-color: #2c5c97;
+        }
+
+        .form-item textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* 上传区域 */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #2c5c97;
+            background: #f0f5ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #2c5c97;
+            background: #e6f0ff;
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .upload-text p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* 多选框组 */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            border-color: #2c5c97;
+            background: rgba(44, 92, 151, 0.05);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* 组织机构树弹窗 */
+        .org-tree-modal {
+            max-width: 600px;
+            max-height: 60vh;
+        }
+
+        .org-tree-content {
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .org-tree-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .org-tree-item:hover {
+            background: #f5f7fa;
+        }
+
+        .org-tree-item.selected {
+            background: #e6f0ff;
+            color: #2c5c97;
+        }
+
+        .org-tree-indent {
+            display: inline-block;
+            width: 16px;
+        }
+
+        /* 预览弹窗 */
+        .preview-modal {
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .preview-content {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .preview-file-info {
+            padding: 12px 16px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-file-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .preview-file-size {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 面板切换标签 */
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: #2c5c97;
+            border-bottom-color: #2c5c97;
+            background: #fff;
+        }
+
+        .tab-btn:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 组织架构搜索容器 */
+        .org-search-container {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 8px 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px;
+        }
+
+        .clear-btn:hover {
+            color: #666;
+        }
+
+        /* 组织架构树容器 */
+        .org-tree-container {
+            height: calc(100% - 84px);
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .org-tree-node {
+            padding: 4px 0;
+        }
+
+        .org-tree-node.level-0 {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .org-tree-node.level-1 {
+            padding-left: 20px;
+            color: #555;
+        }
+
+        .org-tree-node.level-2 {
+            padding-left: 40px;
+            color: #666;
+        }
+
+        .org-tree-node.level-3 {
+            padding-left: 60px;
+            color: #777;
+        }
+
+        .org-tree-node:hover {
+            background: #f0f5ff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .org-tree-node.selected {
+            background: #e8f0fe;
+            color: #2c5c97;
+            border-radius: 4px;
+        }
+
+        .org-tree-expand {
+            display: inline-block;
+            width: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .org-tree-icon {
+            margin-right: 6px;
+        }
+
+        .org-tree-children {
+            display: block;
+        }
+
+        /* 文件夹复选框样式 */
+        .folder-checkbox {
+            margin: 0 6px 0 0;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* 人员面板 */
+        .person-panel {
+            height: calc(100% - 42px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .person-panel .panel-header {
+            flex-shrink: 0;
+        }
+
+        .person-panel .person-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="nav-header">
+        <div class="nav-left">
+            <h1>干部培养档案管理</h1>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">管理员</div>
+        </div>
+    </div>
+
+    <!-- 主体内容 -->
+    <div class="main-container">
+        <!-- 左侧面板 -->
+        <div class="left-panel">
+            <!-- 切换标签 -->
+            <div class="panel-tabs">
+                <button class="tab-btn active" id="orgTreeTab" onclick="showOrgTree()">组织架构</button>
+                <button class="tab-btn" id="personListTab" onclick="showPersonList()" disabled>人员列表</button>
+            </div>
+            
+            <!-- 组织架构搜索栏 -->
+            <div class="org-search-container" id="orgSearchContainer">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="orgSearchInput" placeholder="搜索组织架构" onkeyup="searchOrgTree()">
+                    <button class="clear-btn" id="orgClearBtn" style="display: none;" onclick="clearOrgSearch()">✕</button>
+                </div>
+            </div>
+            
+            <!-- 组织架构树 -->
+            <div class="org-tree-container" id="orgTreeContainer">
+                <!-- 组织架构树将通过JS动态生成 -->
+            </div>
+            
+            <!-- 人员列表（默认隐藏） -->
+            <div class="person-panel" id="personPanel" style="display: none;">
+                <div class="panel-header">
+                    <div class="search-bar">
+                        <div class="search-container">
+                            <input type="text" placeholder="工号/姓名搜索" id="searchInput">
+                            <button class="search-btn" onclick="searchPersons()">🔍</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="person-list" id="personList">
+                    <!-- 人员列表将通过JS动态生成 -->
+                </div>
+                
+                <div class="person-count" id="personCount">共 0 条记录</div>
+                
+                <div class="pagination" id="pagination">
+                    <button onclick="prevPage()" id="prevBtn" disabled>&lt;</button>
+                    <span class="current-page" id="currentPage">1</span>
+                    <button onclick="nextPage()" id="nextBtn">&gt;</button>
+                    <div class="page-jump">
+                        <span>跳转到</span>
+                        <input type="text" id="pageJumpInput" value="1" onkeydown="if(event.keyCode===13) jumpToPage()">
+                        <button class="jump-btn" onclick="jumpToPage()">跳转</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧档案目录 -->
+        <div class="right-panel">
+            <div class="panel-toolbar">
+                <div class="toolbar-left">
+                    <span class="toolbar-title" id="selectedPerson">-</span>
+                    <span style="color: #999; font-size: 13px;">的档案目录</span>
+                </div>
+                <div class="toolbar-actions">
+                    <button class="btn btn-success" onclick="openExportConfirmModal()">
+                        <span>📦</span> 一键导出
+                    </button>
+                    <button class="btn btn-primary" onclick="openNewFolderModal()">
+                        <span>📁</span> 新增文件夹
+                    </button>
+                    <button class="btn btn-secondary" onclick="openUploadModal()">
+                        <span>📤</span> 上传附件
+                    </button>
+                </div>
+            </div>
+            
+            <div class="archive-tree-header">
+                <span class="header-checkbox"><input type="checkbox" id="selectAllFiles" onclick="toggleSelectAllFiles()"></span>
+                <span class="header-name">材料名称</span>
+                <span class="header-info">形成时间 / 大小</span>
+                <span class="header-actions">操作</span>
+            </div>
+            
+            <div class="archive-tree" id="archiveTree">
+                <!-- 档案目录树将通过JS动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 组织架构选择弹窗 -->
+    <div class="modal-overlay" id="orgTreeModal">
+        <div class="modal org-tree-modal">
+            <div class="modal-header">
+                <h3>选择组织机构</h3>
+                <span class="modal-close" onclick="closeModal('orgTreeModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="org-search-bar">
+                    <div class="search-container">
+                        <input type="text" placeholder="搜索组织机构" id="orgSearchInput">
+                        <button class="search-btn" onclick="searchOrg()">🔍</button>
+                    </div>
+                </div>
+                <div class="org-tree-content" id="orgTreeContent">
+                    <!-- 组织架构树 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('orgTreeModal')">取消</button>
+                <button class="btn btn-primary" onclick="confirmOrgSelect()">确定</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- 上传附件弹窗 -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal upload-modal">
+            <div class="modal-header">
+                <h3>上传附件</h3>
+                <span class="modal-close" onclick="closeModal('uploadModal')">&times;</span>
+            </div>
+            <div class="modal-body upload-modal-body">
+                <div class="form-item">
+                    <label>选择文件</label>
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">
+                            <p>点击或拖拽文件到此处上传</p>
+                            <p class="upload-hint">支持 Word、PDF 格式，单个文件不超过 50MB</p>
+                        </div>
+                        <input type="file" id="fileInput" style="display: none;" accept=".doc,.docx,.pdf" multiple>
+                    </div>
+                </div>
+                
+                <!-- 待分类文件列表 -->
+                <div class="form-item" id="uploadFileList" style="display: none;">
+                    <label>文件将按以下分类上传，可拖动调整；</label>
+                    <div id="fileCategoryList" style="max-height: 300px; overflow-y: auto; margin-top: 8px;"></div>
+                    <div style="margin-top: 12px; display: flex; gap: 12px;">
+                        <button class="btn btn-secondary btn-sm" onclick="resetCategories()" style="padding: 4px 12px;">重置为自动分类</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('uploadModal')">返回</button>
+                <button class="btn btn-success" onclick="uploadFilesWithCategory()">确认上传</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量导出弹窗 -->
+    <div class="modal-overlay" id="batchExportModal">
+        <div class="modal batch-export-modal">
+            <div class="modal-header">
+                <h3>批量导出</h3>
+                <span class="modal-close" onclick="closeModal('batchExportModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-item">
+                    <div class="search-container">
+                        <input type="text" id="personSearchInput" placeholder="搜索姓名/工号" onkeyup="filterExportPersons()">
+                        <button class="btn btn-primary search-btn" onclick="filterExportPersons()">搜索</button>
+                    </div>
+                    <div class="person-table-container">
+                        <table class="person-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllPersons" onclick="toggleSelectAll()"></th>
+                                    <th>工号</th>
+                                    <th>姓名</th>
+                                    <th>单位</th>
+                                    <th>部门</th>
+                                    <th>岗位</th>
+                                </tr>
+                            </thead>
+                            <tbody id="personTableBody">
+                                <!-- 人员列表将通过JS动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label>导出方式</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" style="width: 100%;">
+                            <input type="checkbox" id="exportCurrentPage" value="currentPage">
+                            <label for="exportCurrentPage">一键导出当前页面已勾选文件</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label>选择材料类别</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb1" value="report">
+                            <label for="cb1">历年述职报告</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb2" value="evaluation">
+                            <label for="cb2">历次干部考察、考核材料</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb3" value="declaration">
+                            <label for="cb3">历年个人有关情况说明</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb4" value="audit">
+                            <label for="cb4">历次审计报告</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb5" value="supervision">
+                            <label for="cb5">干部监督查核情况说明</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb6" value="other">
+                            <label for="cb6">其他材料</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb7" value="talk">
+                            <label for="cb7">历次谈心谈话记录</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb8" value="check">
+                            <label for="cb8">历次查核情况</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cb9" value="performance">
+                            <label for="cb9">历年履职情况</label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('batchExportModal')">取消</button>
+                <button class="btn btn-success" onclick="batchExport()">确认导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增文件夹弹窗 -->
+    <div class="modal-overlay" id="newFolderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>新增文件夹</h3>
+                <span class="modal-close" onclick="closeModal('newFolderModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-item">
+                    <label>文件夹名称</label>
+                    <input type="text" id="newFolderName" placeholder="请输入文件夹名称">
+                </div>
+                <div class="form-item">
+                    <label>二级目录（选填）</label>
+                    <div id="newFolderSubNamesContainer">
+                        <div class="subfolder-input-row">
+                            <input type="text" class="subfolder-input" placeholder="请输入二级目录名称">
+                            <button class="add-subfolder-btn" onclick="addNewFolderSubInput()">+</button>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: #999; margin-top: 8px;">支持添加多条二级目录，每行一个</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newFolderModal')">取消</button>
+                <button class="btn btn-primary" onclick="createNewFolder()">确认添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增二级目录弹窗 -->
+    <div class="modal-overlay" id="newSubFolderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>新增二级目录</h3>
+                <span class="modal-close" onclick="closeModal('newSubFolderModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-item">
+                    <label>上级目录</label>
+                    <div id="parentFolderName" style="padding: 8px; background: #f5f7fa; border-radius: 4px;"></div>
+                </div>
+                <div class="form-item">
+                    <label>二级目录名称</label>
+                    <div id="subFolderNamesContainer">
+                        <div class="subfolder-input-row">
+                            <input type="text" class="subfolder-input" placeholder="请输入二级目录名称">
+                            <button class="add-subfolder-btn" onclick="addSubfolderInput()">+</button>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: #999; margin-top: 8px;">支持添加多条二级目录，每行一个</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newSubFolderModal')">取消</button>
+                <button class="btn btn-primary" onclick="createSubFolder()">确认添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右键菜单 -->
+    <div id="contextMenu" style="display: none; position: fixed; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); z-index: 9999;">
+        <div id="folderMenuItems">
+            <div class="context-menu-item" onclick="openNewSubFolderModal()">新增二级目录</div>
+            <div class="context-menu-item" onclick="openRenameFolderModal()">修改文件夹名称</div>
+        </div>
+        <div id="fileMenuItems" style="display: none;">
+            <div class="context-menu-item" onclick="openRenameFileModal()">修改文件名称</div>
+        </div>
+    </div>
+
+    <!-- 修改文件夹名称弹窗 -->
+    <div class="modal-overlay" id="renameFolderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>修改文件夹名称</h3>
+                <span class="modal-close" onclick="closeModal('renameFolderModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-item">
+                    <label>原文件夹名称</label>
+                    <div id="originalFolderName" style="padding: 8px; background: #f5f7fa; border-radius: 4px;"></div>
+                </div>
+                <div class="form-item">
+                    <label>新文件夹名称</label>
+                    <input type="text" id="newFolderNameInput" class="form-input" placeholder="请输入新文件夹名称">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('renameFolderModal')">取消</button>
+                <button class="btn btn-primary" onclick="renameFolder()">确认修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改文件名称弹窗 -->
+    <div class="modal-overlay" id="renameFileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>修改文件名称</h3>
+                <span class="modal-close" onclick="closeModal('renameFileModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-item">
+                    <label>原文件名称</label>
+                    <div id="originalFileName" style="padding: 8px; background: #f5f7fa; border-radius: 4px;"></div>
+                </div>
+                <div class="form-item">
+                    <label>新文件名称</label>
+                    <input type="text" id="newFileNameInput" class="form-input" placeholder="请输入新文件名称">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('renameFileModal')">取消</button>
+                <button class="btn btn-primary" onclick="renameFile()">确认修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出确认弹窗 -->
+    <div class="modal-overlay" id="exportConfirmModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>确认导出</h3>
+                <span class="modal-close" onclick="closeModal('exportConfirmModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="padding: 20px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📦</div>
+                    <p style="font-size: 16px; color: #333; margin-bottom: 8px;">确定要导出选中的文件吗？</p>
+                    <p style="font-size: 13px; color: #999;">选中的文件将被打包为ZIP压缩包下载</p>
+                    <div id="exportFileList" style="margin-top: 16px; padding: 12px; background: #f5f7fa; border-radius: 4px; max-height: 200px; overflow-y: auto;">
+                        <!-- 选中文件列表 -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('exportConfirmModal')">取消</button>
+                <button class="btn btn-success" onclick="confirmExport()">确认导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件预览弹窗 -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal preview-modal">
+            <div class="modal-header">
+                <h3>文件预览</h3>
+                <span class="modal-close" onclick="closeModal('previewModal')">&times;</span>
+            </div>
+            <div class="preview-file-info">
+                <span class="preview-file-name" id="previewFileName"></span>
+                <span class="preview-file-size" id="previewFileSize"></span>
+            </div>
+            <div class="preview-content" id="previewContent">
+                <!-- 预览内容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('previewModal')">关闭</button>
+                <button class="btn btn-primary" onclick="downloadFile()">下载</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据
+        const mockPersons = [
+            { id: 'GZ001', name: '张军', dept: '集团总部/董事会办公室', position: '主任' },
+            { id: 'GZ002', name: '周红', dept: '集团总部/董事会办公室', position: '副主任' },
+            { id: 'GZ003', name: '王光艳', dept: '集团总部/董事会办公室', position: '专员' },
+            { id: 'GZ004', name: '庞秀军', dept: '集团总部/董事会办公室', position: '专员' },
+            { id: 'GZ005', name: '向文辉', dept: '集团总部/董事会办公室', position: '助理' },
+            { id: 'GZ006', name: '陈红', dept: '北京分行/人力资源部', position: '经理' },
+            { id: 'GZ007', name: '刘兴冰', dept: '北京分行/财务部', position: '主管' },
+            { id: 'GZ008', name: '黄贵江', dept: '上海分行/风险管理部', position: '经理' },
+            { id: 'GZ009', name: '龚雪松', dept: '上海分行/运营管理部', position: '副经理' },
+            { id: 'GZ010', name: '李明', dept: '广州分行/营业部', position: '总经理' },
+            { id: 'GZ011', name: '赵丽', dept: '集团总部/人力资源部', position: '经理' },
+            { id: 'GZ012', name: '陈伟', dept: '集团总部/人力资源部', position: '副经理' },
+            { id: 'GZ013', name: '刘洋', dept: '集团总部/财务部', position: '主管' },
+            { id: 'GZ014', name: '孙燕', dept: '北京分行/营业部', position: '主任' },
+            { id: 'GZ015', name: '赵强', dept: '北京分行/风险管理部', position: '专员' },
+            { id: 'GZ016', name: '钱敏', dept: '上海分行/财务部', position: '经理' },
+            { id: 'GZ017', name: '孙磊', dept: '上海分行/营业部', position: '副经理' },
+            { id: 'GZ018', name: '周芳', dept: '广州分行/信贷部', position: '经理' },
+            { id: 'GZ019', name: '吴刚', dept: '广州分行/财务部', position: '主管' },
+            { id: 'GZ020', name: '郑洁', dept: '集团总部/董事会办公室', position: '专员' },
+            { id: 'GZ021', name: '王磊', dept: '集团总部/人力资源部', position: '专员' },
+            { id: 'GZ022', name: '李娜', dept: '北京分行/人力资源部', position: '副经理' },
+            { id: 'GZ023', name: '刘强', dept: '北京分行/财务部', position: '专员' },
+            { id: 'GZ024', name: '赵敏', dept: '上海分行/风险管理部', position: '副经理' },
+            { id: 'GZ025', name: '陈刚', dept: '上海分行/运营管理部', position: '专员' },
+            { id: 'GZ026', name: '张丽', dept: '广州分行/营业部', position: '副经理' },
+            { id: 'GZ027', name: '王小', dept: '广州分行/信贷部', position: '主管' },
+            { id: 'GZ028', name: '周明', dept: '集团总部/财务部', position: '副经理' },
+            { id: 'GZ029', name: '吴丽', dept: '集团总部/董事会办公室', position: '助理' },
+            { id: 'GZ030', name: '郑强', dept: '北京分行/营业部', position: '副主任' },
+            { id: 'GZ031', name: '孙伟', dept: '北京分行/风险管理部', position: '主管' },
+            { id: 'GZ032', name: '钱华', dept: '上海分行/财务部', position: '副经理' },
+            { id: 'GZ033', name: '孙丽', dept: '上海分行/营业部', position: '专员' },
+            { id: 'GZ034', name: '周强', dept: '广州分行/信贷部', position: '副经理' },
+            { id: 'GZ035', name: '吴敏', dept: '广州分行/财务部', position: '专员' },
+            { id: 'GZ036', name: '郑芳', dept: '集团总部/人力资源部', position: '主管' },
+            { id: 'GZ037', name: '王芳', dept: '集团总部/董事会办公室', position: '主任助理' },
+            { id: 'GZ038', name: '李强', dept: '北京分行/人力资源部', position: '专员' },
+            { id: 'GZ039', name: '刘芳', dept: '北京分行/财务部', position: '副主任' },
+            { id: 'GZ040', name: '赵刚', dept: '上海分行/风险管理部', position: '专员' },
+            { id: 'GZ041', name: '钱芳', dept: '上海分行/运营管理部', position: '主管' },
+            { id: 'GZ042', name: '孙敏', dept: '广州分行/营业部', position: '专员' },
+            { id: 'GZ043', name: '周丽', dept: '广州分行/信贷部', position: '专员' },
+            { id: 'GZ044', name: '吴刚', dept: '集团总部/财务部', position: '专员' },
+            { id: 'GZ045', name: '郑伟', dept: '集团总部/董事会办公室', position: '副主任' },
+        ];
+
+        const mockOrgTree = [
+            { id: 'org1', name: '集团总部', children: [
+                { id: 'org1-1', name: '董事会办公室', children: [
+                    { id: 'org1-1-1', name: '综合管理组' },
+                    { id: 'org1-1-2', name: '档案管理组' }
+                ]},
+                { id: 'org1-2', name: '人力资源部', children: [
+                    { id: 'org1-2-1', name: '干部管理科' },
+                    { id: 'org1-2-2', name: '薪酬福利科' }
+                ]},
+                { id: 'org1-3', name: '财务部' }
+            ]},
+            { id: 'org2', name: '北京分行', children: [
+                { id: 'org2-1', name: '人力资源部' },
+                { id: 'org2-2', name: '财务部' },
+                { id: 'org2-3', name: '营业部' }
+            ]},
+            { id: 'org3', name: '上海分行', children: [
+                { id: 'org3-1', name: '风险管理部' },
+                { id: 'org3-2', name: '运营管理部' }
+            ]},
+            { id: 'org4', name: '广州分行', children: [
+                { id: 'org4-1', name: '营业部' },
+                { id: 'org4-2', name: '信贷部' }
+            ]}
+        ];
+
+        const mockArchiveTree = {
+            "历年述职报告": [
+                { name: '2024年度述职报告.docx', date: '2024-01-15', size: '2.3MB', remark: '已审核通过' },
+                { name: '2023年度述职报告.docx', date: '2023-01-18', size: '1.8MB', remark: '此报告内容详实，涵盖全年工作重点及未来规划，经评审组一致认可' },
+                { name: '2022年度述职报告.pdf', date: '2022-01-20', size: '1.5MB', remark: '' }
+            ],
+            "历次干部考察、考核材料": [
+                { name: '2024年度考核表.docx', date: '2024-03-20', size: '512KB', remark: '考核结果：优秀' },
+                { name: '2023年度考察材料.pdf', date: '2023-04-15', size: '890KB', remark: '组织考察结论：胜任现职，建议继续培养' },
+                { name: '2022年度考核鉴定表.docx', date: '2022-03-25', size: '456KB', remark: '年度考核：良好' }
+            ],
+            "历年个人有关情况说明": [
+                { name: '2024年个人有关事项报告.docx', date: '2024-02-10', size: '1.2MB', remark: '已完成核实，无异常情况' },
+                { name: '2023年个人有关事项报告.docx', date: '2023-02-15', size: '1.1MB', remark: '' }
+            ],
+            "历次审计报告": [
+                { name: '2024年度经济责任审计报告.pdf', date: '2024-06-30', size: '5.2MB', remark: '审计结论：未发现重大问题' },
+                { name: '2023年度财务审计报告.pdf', date: '2023-07-15', size: '4.8MB', remark: '需关注部分费用报销合规性问题' }
+            ],
+            "干部监督查核情况说明": [
+                { name: '信访举报核查情况报告.docx', date: '2024-05-20', size: '890KB', remark: '经核查，举报内容不属实，已反馈举报人' }
+            ],
+            "其他材料": [
+                { name: '高级经济师职称证书.pdf', date: '2023-12-01', size: '1.5MB', remark: '正高级职称' },
+                { name: '省部级奖励证书.pdf', date: '2022-09-15', size: '2.1MB', remark: '获得XX省科技进步一等奖' },
+                { name: '挂职锻炼鉴定表.docx', date: '2021-08-20', size: '345KB', remark: '' }
+            ],
+            "历次谈心谈话记录": [
+                { name: '2024年一季度谈心谈话记录.docx', date: '2024-03-20', size: '234KB', remark: '谈话主题：工作压力与职业发展规划' },
+                { name: '2023年四季度谈心谈话记录.docx', date: '2023-12-15', size: '198KB', remark: '年度考核反馈谈话' }
+            ],
+            "历次查核情况": [
+                { name: '2024年个人事项查核报告.pdf', date: '2024-04-30', size: '678KB', remark: '查核结果：全部属实' }
+            ],
+            "历年履职情况": [
+                { name: '2024年履职总结报告.docx', date: '2024-01-10', size: '1.2MB', remark: '任期内完成重点工作任务12项' },
+                { name: '干部任免审批表.pdf', date: '2023-08-15', size: '890KB', remark: '' }
+            ]
+        };
+
+        // 当前选中的人员
+        let currentPerson = null;
+
+        // 初始化页面
+        let selectedOrgId = null;
+        let allPersons = [];
+        let filteredPersons = [];
+
+        function initPage() {
+            renderLeftOrgTree(mockOrgTree);
+            renderOrgTree(mockOrgTree, 'orgTreeContent');
+            renderExportPersons(mockPersons);
+        }
+
+        // 渲染左侧组织架构树
+        function renderLeftOrgTree(data, level = 0, parentId = null) {
+            const container = document.getElementById('orgTreeContainer');
+            if (level === 0) {
+                container.innerHTML = '';
+            }
+            
+            data.forEach(item => {
+                const node = document.createElement('div');
+                node.className = `org-tree-node level-${level}`;
+                node.dataset.id = item.id;
+                node.dataset.parentId = parentId;
+                
+                let expandIcon = '';
+                if (item.children && item.children.length > 0) {
+                    expandIcon = '<span class="org-tree-expand" onclick="toggleOrgExpand(this, event)">▶</span>';
+                } else {
+                    expandIcon = '<span class="org-tree-expand">·</span>';
+                }
+                
+                node.innerHTML = `${expandIcon}<span class="org-tree-icon">🏢</span>${item.name}`;
+                node.onclick = () => selectOrgNode(item);
+                container.appendChild(node);
+                
+                if (item.children) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'org-tree-children';
+                    childrenContainer.dataset.parentId = item.id;
+                    container.appendChild(childrenContainer);
+                    renderLeftOrgTree(item.children, level + 1, item.id);
+                }
+            });
+        }
+
+        // 切换组织架构树展开/折叠
+        function toggleOrgExpand(icon, event) {
+            event.stopPropagation();
+            const parentNode = icon.parentElement;
+            const parentId = parentNode.dataset.id;
+            const childrenContainer = document.querySelector(`.org-tree-children[data-parent-id="${parentId}"]`);
+            
+            if (childrenContainer) {
+                if (childrenContainer.style.display === 'none') {
+                    childrenContainer.style.display = 'block';
+                    icon.textContent = '▼';
+                } else {
+                    childrenContainer.style.display = 'none';
+                    icon.textContent = '▶';
+                }
+            }
+        }
+
+        // 选择组织架构节点
+        function selectOrgNode(node) {
+            // 移除之前的选中状态
+            document.querySelectorAll('.org-tree-node').forEach(n => n.classList.remove('selected'));
+            
+            // 设置当前选中状态
+            const selectedNode = document.querySelector(`.org-tree-node[data-id="${node.id}"]`);
+            if (selectedNode) {
+                selectedNode.classList.add('selected');
+            }
+            
+            selectedOrgId = node.id;
+            
+            // 根据选中的组织架构筛选人员
+            filterPersonsByOrg(node.id);
+            
+            // 启用人员列表标签
+            document.getElementById('personListTab').disabled = false;
+            showPersonList();
+        }
+
+        // 根据组织架构筛选人员
+        function filterPersonsByOrg(orgId) {
+            // 根据组织架构ID筛选人员（模拟逻辑）
+            let orgName = getOrgNameById(orgId);
+            
+            filteredPersons = mockPersons.filter(person => {
+                return person.dept.includes(orgName) || person.dept.startsWith(getOrgNameById(orgId));
+            });
+            
+            allPersons = [...filteredPersons];
+            currentPage = 1;
+            updatePagination();
+            renderPersonListPage(currentPage);
+            
+            document.getElementById('personCount').textContent = `共 ${filteredPersons.length} 条记录`;
+        }
+
+        // 根据ID获取组织名称
+        function getOrgNameById(orgId) {
+            const findName = (data) => {
+                for (let item of data) {
+                    if (item.id === orgId) return item.name;
+                    if (item.children) {
+                        const found = findName(item.children);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            };
+            return findName(mockOrgTree);
+        }
+
+        // 显示组织架构树
+        function showOrgTree() {
+            document.getElementById('orgTreeTab').classList.add('active');
+            document.getElementById('personListTab').classList.remove('active');
+            document.getElementById('orgTreeContainer').style.display = 'block';
+            document.getElementById('personPanel').style.display = 'none';
+            document.getElementById('orgSearchContainer').style.display = 'block';
+        }
+
+        // 搜索组织架构树
+        function searchOrgTree() {
+            const keyword = document.getElementById('orgSearchInput').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('orgClearBtn');
+            
+            // 显示/隐藏清空按钮
+            clearBtn.style.display = keyword !== '' ? 'block' : 'none';
+            
+            const nodes = document.querySelectorAll('.org-tree-node');
+            
+            nodes.forEach(node => {
+                const text = node.textContent.toLowerCase();
+                if (keyword === '' || text.includes(keyword)) {
+                    node.style.display = 'block';
+                    // 显示父节点
+                    let parent = node.parentElement;
+                    while (parent) {
+                        if (parent.classList.contains('org-tree-children')) {
+                            parent.style.display = 'block';
+                        }
+                        parent = parent.parentElement;
+                    }
+                } else {
+                    node.style.display = 'none';
+                }
+            });
+            
+            // 如果搜索结果为空，提示用户
+            const visibleNodes = document.querySelectorAll('.org-tree-node:not([style*="display: none"])');
+            if (visibleNodes.length === 0 && keyword !== '') {
+                alert('未找到匹配的组织架构');
+            }
+        }
+
+        // 清空组织架构搜索
+        function clearOrgSearch() {
+            const input = document.getElementById('orgSearchInput');
+            const clearBtn = document.getElementById('orgClearBtn');
+            
+            input.value = '';
+            clearBtn.style.display = 'none';
+            
+            // 重新渲染完整的组织架构树
+            renderLeftOrgTree(mockOrgTree);
+        }
+
+        // 显示人员列表
+        function showPersonList() {
+            if (document.getElementById('personListTab').disabled) {
+                alert('请先选择组织架构进行筛选');
+                return;
+            }
+            
+            document.getElementById('personListTab').classList.add('active');
+            document.getElementById('orgTreeTab').classList.remove('active');
+            document.getElementById('orgTreeContainer').style.display = 'none';
+            document.getElementById('personPanel').style.display = 'flex';
+            document.getElementById('orgSearchContainer').style.display = 'none';
+        }
+
+        // 渲染人员列表
+        function renderPersonList(persons) {
+            const container = document.getElementById('personList');
+            container.innerHTML = persons.map(person => `
+                <div class="person-item" data-id="${person.id}" onclick="selectPerson('${person.id}')">
+                    <div class="person-avatar">${person.name.charAt(0)}</div>
+                    <div class="person-info">
+                        <div class="person-name">${person.name}</div>
+                        <div class="person-dept">${person.dept}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('personCount').textContent = `共 ${persons.length} 条记录`;
+            
+            // 默认选中第一个人员
+            if (persons.length > 0) {
+                selectPerson(persons[0].id);
+            }
+        }
+
+        // 选中人员
+        function selectPerson(personId) {
+            // 移除之前选中的样式
+            document.querySelectorAll('.person-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 添加当前选中样式
+            const selectedItem = document.querySelector(`.person-item[data-id="${personId}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('active');
+            }
+            
+            // 获取人员信息
+            currentPerson = mockPersons.find(p => p.id === personId);
+            
+            // 更新标题
+            if (currentPerson) {
+                document.getElementById('selectedPerson').textContent = `${currentPerson.name} (${currentPerson.id})`;
+                renderArchiveTree(currentPerson);
+            }
+        }
+
+        let currentRightClickFolder = null;
+
+        // 渲染档案目录树
+        function renderArchiveTree(person) {
+            const container = document.getElementById('archiveTree');
+            
+            // 如果没有选中人员，显示提示
+            if (!person) {
+                container.innerHTML = '<div style="text-align: center; padding: 50px; color: #999;">请从左侧选择人员查看档案目录</div>';
+                return;
+            }
+            
+            // 渲染目录树
+            const html = Object.entries(mockArchiveTree).map(([category, files]) => {
+                const hasChildren = files && files.length > 0;
+                return `
+                    <div class="tree-node">
+                        <div class="tree-item folder" onclick="toggleFolder(this)" oncontextmenu="showFolderContextMenu(event, '${category}')">
+                            <span class="tree-expand ${hasChildren ? 'expanded' : 'collapsed'}"></span>
+                            <input type="checkbox" class="folder-checkbox" data-category="${category}" onclick="toggleFolderSelect(this, '${category}')">
+                            <span class="tree-icon">📁</span>
+                            <span class="tree-name">${category}</span>
+                            <span class="tree-info">${files ? files.length : 0} 份材料</span>
+                            <span class="tree-actions"></span>
+                        </div>
+                        ${hasChildren ? `
+                            <div class="tree-children" style="display: block;">
+                                ${files.map(file => `
+                                    <div class="tree-item file" data-file="${file.name}" oncontextmenu="showFileContextMenu(event, '${file.name}', '${category}')">
+                                        <input type="checkbox" class="file-checkbox" data-file="${file.name}" data-category="${category}">
+                                        <span class="tree-icon">📄</span>
+                                        <span class="tree-name" style="cursor: pointer;" onclick="previewFile('${file.name}', '${file.size}')">${file.name}</span>
+                                        <span class="tree-info">
+                                            <span>${file.date}</span>
+                                            <span>${file.size}</span>
+                                        </span>
+                                        <span class="tree-actions">
+                                            <span class="action-icon tooltip" data-tooltip="预览" onclick="previewFile('${file.name}', '${file.size}')">👁</span>
+                                            <span class="action-icon tooltip" data-tooltip="下载" onclick="downloadFileByName('${file.name}')">⬇</span>
+                                            <span class="action-icon tooltip" data-tooltip="删除" onclick="deleteFile('${file.name}')">✕</span>
+                                        </span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // 全选/取消全选文件
+        function toggleSelectAllFiles() {
+            const checkboxes = document.querySelectorAll('.file-checkbox');
+            const folderCheckboxes = document.querySelectorAll('.folder-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllFiles');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            folderCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        // 勾选/取消勾选文件夹
+        function toggleFolderSelect(checkbox, category) {
+            const fileCheckboxes = document.querySelectorAll(`.file-checkbox[data-category="${category}"]`);
+            fileCheckboxes.forEach(fileCb => {
+                fileCb.checked = checkbox.checked;
+            });
+            
+            // 更新全选状态
+            updateSelectAllStatus();
+        }
+
+        // 更新全选复选框状态
+        function updateSelectAllStatus() {
+            const allFileCheckboxes = document.querySelectorAll('.file-checkbox');
+            const allFolderCheckboxes = document.querySelectorAll('.folder-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllFiles');
+            
+            if (allFileCheckboxes.length === 0) {
+                selectAllCheckbox.checked = false;
+                return;
+            }
+            
+            const allChecked = [...allFileCheckboxes].every(cb => cb.checked);
+            selectAllCheckbox.checked = allChecked;
+        }
+
+        // 文件复选框点击时更新文件夹复选框状态
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('file-checkbox')) {
+                const category = e.target.dataset.category;
+                const fileCheckboxes = document.querySelectorAll(`.file-checkbox[data-category="${category}"]`);
+                const folderCheckbox = document.querySelector(`.folder-checkbox[data-category="${category}"]`);
+                
+                if (folderCheckbox) {
+                    const allChecked = [...fileCheckboxes].every(cb => cb.checked);
+                    folderCheckbox.checked = allChecked;
+                }
+                
+                updateSelectAllStatus();
+        }
+    });
+
+    // 打开导出确认弹窗
+        function openExportConfirmModal() {
+            const checkedFiles = Array.from(document.querySelectorAll('.file-checkbox:checked'))
+                .map(cb => ({ name: cb.dataset.file, category: cb.dataset.category }));
+            
+            if (checkedFiles.length === 0) {
+                alert('请先勾选内容');
+                return;
+            }
+            
+            const fileListDiv = document.getElementById('exportFileList');
+            fileListDiv.innerHTML = `
+                <p style="font-weight: 600; margin-bottom: 8px; color: #666;">共 ${checkedFiles.length} 个文件：</p>
+                <ul style="text-align: left; margin: 0; padding-left: 20px;">
+                    ${checkedFiles.map(f => `<li style="font-size: 13px; color: #333; margin: 4px 0;">${f.category}/${f.name}</li>`).join('')}
+                </ul>
+            `;
+            
+            openModal('exportConfirmModal');
+        }
+
+        // 确认导出
+        function confirmExport() {
+            const checkedFiles = Array.from(document.querySelectorAll('.file-checkbox:checked'))
+                .map(cb => ({ name: cb.dataset.file, category: cb.dataset.category }));
+            
+            const fileList = checkedFiles.map(f => `${f.category}/${f.name}`).join('\n');
+            alert(`正在导出 ${checkedFiles.length} 个文件:\n\n${fileList}\n\n文件将被打包为ZIP压缩包下载`);
+            
+            // 取消所有勾选
+            document.querySelectorAll('.file-checkbox').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.folder-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllFiles').checked = false;
+            
+            closeModal('exportConfirmModal');
+            updateExportButtonVisibility();
+        }
+
+        let currentRightClickFile = null;
+        let currentRightClickFileCategory = null;
+
+        // 显示文件夹右键菜单
+        function showFolderContextMenu(event, folderName) {
+            event.preventDefault();
+            currentRightClickFolder = folderName;
+            currentRightClickFile = null;
+            currentRightClickFileCategory = null;
+            
+            const menu = document.getElementById('contextMenu');
+            document.getElementById('folderMenuItems').style.display = 'block';
+            document.getElementById('fileMenuItems').style.display = 'none';
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.style.display = 'block';
+        }
+
+        // 显示文件右键菜单
+        function showFileContextMenu(event, fileName, category) {
+            event.preventDefault();
+            currentRightClickFile = fileName;
+            currentRightClickFileCategory = category;
+            currentRightClickFolder = null;
+            
+            const menu = document.getElementById('contextMenu');
+            document.getElementById('folderMenuItems').style.display = 'none';
+            document.getElementById('fileMenuItems').style.display = 'block';
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.style.display = 'block';
+        }
+
+        // 点击页面其他地方关闭右键菜单
+        document.addEventListener('click', function() {
+            document.getElementById('contextMenu').style.display = 'none';
+        });
+
+        // 展开/折叠文件夹
+        function toggleFolder(element) {
+            const expandIcon = element.querySelector('.tree-expand');
+            const children = element.nextElementSibling;
+            
+            if (expandIcon && children) {
+                if (expandIcon.classList.contains('expanded')) {
+                    expandIcon.classList.remove('expanded');
+                    expandIcon.classList.add('collapsed');
+                    children.style.display = 'none';
+                } else {
+                    expandIcon.classList.remove('collapsed');
+                    expandIcon.classList.add('expanded');
+                    children.style.display = 'block';
+                }
+            }
+        }
+
+        // 渲染组织架构树
+        function renderOrgTree(nodes, containerId, level = 0) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            if (level === 0) {
+                container.innerHTML = '';
+            }
+            
+            nodes.forEach(node => {
+                const div = document.createElement('div');
+                div.className = 'org-tree-item';
+                div.dataset.id = node.id;
+                div.innerHTML = `
+                    <span style="margin-left: ${level * 16}px;">${node.children ? '📁' : '📋'}</span>
+                    <span>${node.name}</span>
+                `;
+                
+                div.onclick = () => {
+                    document.querySelectorAll('.org-tree-item').forEach(item => item.classList.remove('selected'));
+                    div.classList.add('selected');
+                };
+                
+                container.appendChild(div);
+                
+                if (node.children && node.children.length > 0) {
+                    renderOrgTree(node.children, containerId, level + 1);
+                }
+            });
+        }
+
+        // 渲染导出人员选择（表格形式）
+        function renderExportPersons(persons) {
+            const tbody = document.getElementById('personTableBody');
+            tbody.innerHTML = persons.map(p => `
+                <tr data-id="${p.id}">
+                    <td><input type="checkbox" class="person-checkbox" value="${p.id}"></td>
+                    <td>${p.id}</td>
+                    <td>${p.name}</td>
+                    <td>${getUnit(p.dept)}</td>
+                    <td>${getDepartment(p.dept)}</td>
+                    <td>${p.position || '-'}</td>
+                </tr>
+            `).join('');
+            
+            // 添加行点击事件
+            tbody.querySelectorAll('tr').forEach(tr => {
+                tr.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        const checkbox = this.querySelector('.person-checkbox');
+                        checkbox.checked = !checkbox.checked;
+                        this.classList.toggle('selected', checkbox.checked);
+                    }
+                });
+            });
+            
+            // 添加checkbox点击事件
+            tbody.querySelectorAll('.person-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    this.closest('tr').classList.toggle('selected', this.checked);
+                });
+            });
+        }
+
+        // 从部门中提取单位
+        function getUnit(dept) {
+            const unitMap = {
+                '集团总部/董事会办公室': '集团总部',
+                '总行人力资源部': '总行',
+                '北京分行/人力资源部': '北京分行',
+                '北京分行/财务部': '北京分行',
+                '北京分行/营业部': '北京分行',
+                '上海分行/风险管理部': '上海分行',
+                '上海分行/运营管理部': '上海分行',
+                '广州分行/营业部': '广州分行',
+                '广州分行/信贷部': '广州分行'
+            };
+            return unitMap[dept] || dept.split('/')[0] || dept;
+        }
+
+        // 从部门中提取部门
+        function getDepartment(dept) {
+            const deptMap = {
+                '集团总部/董事会办公室': '董事会办公室',
+                '总行人力资源部': '人力资源部',
+                '北京分行/人力资源部': '人力资源部',
+                '北京分行/财务部': '财务部',
+                '北京分行/营业部': '营业部',
+                '上海分行/风险管理部': '风险管理部',
+                '上海分行/运营管理部': '运营管理部',
+                '广州分行/营业部': '营业部',
+                '广州分行/信贷部': '信贷部'
+            };
+            return deptMap[dept] || dept.split('/')[1] || dept;
+        }
+
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAllPersons');
+            const checkboxes = document.querySelectorAll('.person-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+                cb.closest('tr').classList.toggle('selected', selectAll.checked);
+            });
+        }
+
+        // 搜索过滤人员
+        function filterExportPersons() {
+            const keyword = document.getElementById('personSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#personTableBody tr');
+            rows.forEach(row => {
+                const id = row.dataset.id.toLowerCase();
+                const name = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                row.style.display = (id.includes(keyword) || name.includes(keyword)) ? '' : 'none';
+            });
+        }
+
+        // 搜索人员
+        function searchPersons() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = mockPersons.filter(p => 
+                p.id.toLowerCase().includes(keyword) || 
+                p.name.toLowerCase().includes(keyword)
+            );
+            renderPersonList(filtered);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', searchPersons);
+
+
+
+        // 打开弹窗
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 打开组织架构弹窗
+        function searchOrg() {
+            const keyword = document.getElementById('orgSearchInput').value.toLowerCase();
+            const items = document.querySelectorAll('.org-tree-item');
+            items.forEach(item => {
+                const name = item.textContent.toLowerCase();
+                item.style.display = name.includes(keyword) ? '' : 'none';
+            });
+        }
+
+        function openOrgTreeModal() {
+            openModal('orgTreeModal');
+            // 添加搜索功能
+            document.getElementById('orgSearchInput').addEventListener('input', searchOrg);
+        }
+
+        // 确认组织选择
+        function confirmOrgSelect() {
+            const selected = document.querySelector('.org-tree-item.selected');
+            if (selected) {
+                const filterTags = document.getElementById('filterTags');
+                const newTag = document.createElement('span');
+                newTag.className = 'filter-tag';
+                newTag.innerHTML = `${selected.textContent.trim()} <span class="remove" onclick="this.parentElement.remove()">×</span>`;
+                filterTags.appendChild(newTag);
+            }
+            closeModal('orgTreeModal');
+        }
+
+        // 打开上传弹窗
+        function openUploadModal() {
+            if (!currentPerson) {
+                alert('请先选择人员');
+                return;
+            }
+            openModal('uploadModal');
+        }
+
+        // 待上传文件列表
+        let pendingFiles = [];
+
+        // 关键词到目录的映射规则
+        const categoryRules = [
+            { keywords: ['述职', '年度总结', '履职总结', '工作总结'], key: 'report', name: '历年述职报告' },
+            { keywords: ['考察', '考核', '测评', '鉴定', '评议'], key: 'evaluation', name: '历次干部考察、考核材料' },
+            { keywords: ['审计', '财务', '经济责任'], key: 'audit', name: '历次审计报告' },
+            { keywords: ['监督', '查核', '情况说明', '说明'], key: 'supervision', name: '干部监督查核情况说明' },
+            { keywords: ['谈话', '谈心', '谈话记录'], key: 'talk', name: '历次谈心谈话记录' },
+            { keywords: ['查核', '核实', '核查'], key: 'check', name: '历次查核情况' },
+        ];
+
+        // 根据文件名智能分类
+        function autoCategorize(fileName) {
+            const lowerName = fileName.toLowerCase();
+            for (const rule of categoryRules) {
+                for (const keyword of rule.keywords) {
+                    if (lowerName.includes(keyword.toLowerCase())) {
+                        return rule;
+                    }
+                }
+            }
+            // 默认分类到其他材料
+            return { key: 'other', name: '其他材料' };
+        }
+
+        // 文件选择处理
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                for (const file of files) {
+                    const category = autoCategorize(file.name);
+                    pendingFiles.push({
+                        name: file.name,
+                        size: file.size,
+                        category: category.key,
+                        categoryName: category.name,
+                        isAuto: true
+                    });
+                }
+                renderFileCategoryList();
+                document.getElementById('uploadFileList').style.display = 'block';
+            }
+        });
+
+        // 渲染文件分类列表（按目录分组）
+        function renderFileCategoryList() {
+            const container = document.getElementById('fileCategoryList');
+            if (pendingFiles.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999;">暂无待分类文件</p>';
+                return;
+            }
+            
+            // 按分类分组
+            const groupedFiles = {};
+            pendingFiles.forEach((file, index) => {
+                if (!groupedFiles[file.category]) {
+                    groupedFiles[file.category] = [];
+                }
+                groupedFiles[file.category].push({ ...file, index });
+            });
+            
+            let html = '';
+            Object.keys(groupedFiles).forEach(categoryKey => {
+                const categoryName = getCategoryNameByKey(categoryKey);
+                const files = groupedFiles[categoryKey];
+                
+                const categoryOptions = categoryRules.map(rule => 
+                    `<option value="${rule.key}" ${categoryKey === rule.key ? 'selected' : ''}>${rule.name}</option>`
+                ).join('') + `<option value="other" ${categoryKey === 'other' ? 'selected' : ''}>其他材料</option>`;
+                
+                html += `
+                    <div style="border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 8px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; padding: 10px 12px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
+                            <select class="category-select" onchange="changeCategoryGroup('${categoryKey}', this.value)" style="flex: 1; padding: 4px 8px; font-size: 13px; border-radius: 4px; border: 1px solid #e0e0e0;">
+                                ${categoryOptions}
+                            </select>
+                            <span style="margin-left: 8px; font-size: 12px; color: #666;">${files.length} 个文件</span>
+                            <span style="margin-left: 8px; font-size: 11px; color: #10b981;">✓</span>
+                        </div>
+                        <div style="padding: 8px 12px;">
+                `;
+                
+                files.forEach(item => {
+                    html += `
+                        <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: 1px dashed #eee; ${item.index % 2 === 0 ? '' : ''}">
+                            <span style="flex: 1; font-size: 13px; color: #333;">📄 ${item.name}</span>
+                            <span style="margin-left: 8px; font-size: 12px; color: #999;">${(item.size / 1024).toFixed(1)}KB</span>
+                            <button onclick="removePendingFile(${item.index})" style="margin-left: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 16px;">×</button>
+                        </div>
+                    `;
+                });
+                
+                html += '</div></div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // 更改整个分类组的目录
+        function changeCategoryGroup(oldCategory, newCategory) {
+            if (oldCategory === newCategory) return;
+            
+            pendingFiles.forEach(file => {
+                if (file.category === oldCategory) {
+                    const rule = categoryRules.find(r => r.key === newCategory);
+                    file.category = newCategory;
+                    file.categoryName = rule ? rule.name : '其他材料';
+                    file.isAuto = false;
+                }
+            });
+            renderFileCategoryList();
+        }
+
+
+
+        // 重置为自动分类
+        function resetCategories() {
+            pendingFiles.forEach(file => {
+                const category = autoCategorize(file.name);
+                file.category = category.key;
+                file.categoryName = category.name;
+                file.isAuto = true;
+            });
+            renderFileCategoryList();
+        }
+
+        // 移除待上传文件
+        function removePendingFile(index) {
+            pendingFiles.splice(index, 1);
+            if (pendingFiles.length === 0) {
+                document.getElementById('uploadFileList').style.display = 'none';
+            }
+            renderFileCategoryList();
+        }
+
+        // 获取分类key对应的显示名称
+        function getCategoryNameByKey(key) {
+            const rule = categoryRules.find(r => r.key === key);
+            return rule ? rule.name : '其他材料';
+        }
+
+        // 上传文件（带分类）
+        function uploadFilesWithCategory() {
+            if (pendingFiles.length === 0) {
+                alert('请先选择要上传的文件');
+                return;
+            }
+            
+            // 将文件分配到对应目录
+            pendingFiles.forEach(file => {
+                const categoryName = getCategoryNameByKey(file.category);
+                if (!mockArchiveTree[categoryName]) {
+                    mockArchiveTree[categoryName] = [];
+                }
+                const sizeInKB = (file.size / 1024).toFixed(1);
+                mockArchiveTree[categoryName].push({
+                    name: file.name,
+                    size: `${sizeInKB}KB`,
+                    date: new Date().toLocaleDateString('zh-CN'),
+                    remark: ''
+                });
+            });
+            
+            alert(`成功上传 ${pendingFiles.length} 个文件！`);
+            closeModal('uploadModal');
+            
+            // 重置状态
+            pendingFiles = [];
+            document.getElementById('fileInput').value = '';
+            document.getElementById('uploadFileList').style.display = 'none';
+            
+            // 重新渲染目录树
+            renderArchiveTree(currentPerson);
+        }
+
+        // 打开批量导出弹窗
+        function openBatchExportModal() {
+            openModal('batchExportModal');
+        }
+
+        // 批量导出
+        function batchExport() {
+            const exportCurrentPage = document.getElementById('exportCurrentPage').checked;
+            
+            if (exportCurrentPage) {
+                // 导出当前页面已勾选的文件
+                const selectedFiles = Array.from(document.querySelectorAll('.file-checkbox:checked'))
+                    .map(cb => ({ name: cb.dataset.file, category: cb.dataset.category }));
+                
+                if (selectedFiles.length === 0) {
+                    alert('请在档案目录中勾选要导出的文件');
+                    return;
+                }
+                
+                const fileList = selectedFiles.map(f => `${f.category}/${f.name}`).join('\n');
+                alert(`即将导出当前页面勾选的文件:\n\n${fileList}\n\n导出格式: ZIP压缩包`);
+                closeModal('batchExportModal');
+            } else {
+                // 按人员和类别导出
+                const selectedPersons = Array.from(document.querySelectorAll('.person-checkbox:checked')).map(cb => cb.value);
+                const selectedCategories = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:not(#exportCurrentPage):checked')).map(cb => cb.value);
+                
+                if (selectedPersons.length === 0) {
+                    alert('请选择要导出的人员');
+                    return;
+                }
+                if (selectedCategories.length === 0) {
+                    alert('请选择要导出的材料类别');
+                    return;
+                }
+                
+                const categoryNames = {
+                    'report': '历年述职报告',
+                    'evaluation': '历次干部考察、考核材料',
+                    'declaration': '历年个人有关情况说明',
+                    'audit': '历次审计报告',
+                    'supervision': '干部监督查核情况说明',
+                    'other': '其他材料',
+                    'talk': '历次谈心谈话记录',
+                    'check': '历次查核情况',
+                    'performance': '历年履职情况'
+                };
+                
+                const selectedCategoryNames = selectedCategories.map(c => categoryNames[c] || c);
+                
+                alert(`即将导出:\n人员: ${selectedPersons.join(', ')}\n材料类别: ${selectedCategoryNames.join('、')}\n\n导出格式: ZIP压缩包`);
+                closeModal('batchExportModal');
+            }
+        }
+
+        // 打开新增文件夹弹窗
+        function openNewFolderModal() {
+            document.getElementById('newFolderName').value = '';
+            
+            // 重置二级目录输入框，只保留一个
+            const container = document.getElementById('newFolderSubNamesContainer');
+            container.innerHTML = `
+                <div class="subfolder-input-row">
+                    <input type="text" class="subfolder-input" placeholder="请输入二级目录名称">
+                    <button class="add-subfolder-btn" onclick="addNewFolderSubInput()">+</button>
+                </div>
+            `;
+            
+            openModal('newFolderModal');
+        }
+
+        // 添加新文件夹的二级目录输入框
+        function addNewFolderSubInput() {
+            const container = document.getElementById('newFolderSubNamesContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'subfolder-input-row';
+            newRow.innerHTML = `
+                <input type="text" class="subfolder-input" placeholder="请输入二级目录名称">
+                <button class="add-subfolder-btn" onclick="removeNewFolderSubInput(this)">-</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // 移除新文件夹的二级目录输入框
+        function removeNewFolderSubInput(btn) {
+            const container = document.getElementById('newFolderSubNamesContainer');
+            const rows = container.querySelectorAll('.subfolder-input-row');
+            if (rows.length > 1) {
+                btn.parentElement.remove();
+            }
+        }
+
+        // 创建新文件夹
+        function createNewFolder() {
+            const folderName = document.getElementById('newFolderName').value.trim();
+            const inputs = document.querySelectorAll('#newFolderSubNamesContainer .subfolder-input');
+            const subFolderNames = Array.from(inputs)
+                .map(input => input.value.trim())
+                .filter(name => name);
+            
+            if (!folderName) {
+                alert('请输入文件夹名称');
+                return;
+            }
+            
+            if (!mockArchiveTree[folderName]) {
+                mockArchiveTree[folderName] = [];
+                
+                subFolderNames.forEach(name => {
+                    mockArchiveTree[folderName].push({ 
+                        name: name, 
+                        date: new Date().toISOString().split('T')[0], 
+                        size: '0KB', 
+                        remark: '' 
+                    });
+                });
+                
+                alert(`文件夹 "${folderName}" 创建成功${subFolderNames.length > 0 ? `，已添加 ${subFolderNames.length} 个二级目录` : ''}！`);
+                closeModal('newFolderModal');
+                renderArchiveTree(currentPerson);
+            } else {
+                alert('该文件夹名称已存在');
+            }
+        }
+
+        // 打开新增二级目录弹窗
+        function openNewSubFolderModal() {
+            document.getElementById('parentFolderName').textContent = currentRightClickFolder || '未知目录';
+            document.getElementById('contextMenu').style.display = 'none';
+            
+            // 重置输入框，只保留一个
+            const container = document.getElementById('subFolderNamesContainer');
+            container.innerHTML = `
+                <div class="subfolder-input-row">
+                    <input type="text" class="subfolder-input" placeholder="请输入二级目录名称">
+                    <button class="add-subfolder-btn" onclick="addSubfolderInput()">+</button>
+                </div>
+            `;
+            
+            openModal('newSubFolderModal');
+        }
+
+        // 添加二级目录输入框
+        function addSubfolderInput() {
+            const container = document.getElementById('subFolderNamesContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'subfolder-input-row';
+            newRow.innerHTML = `
+                <input type="text" class="subfolder-input" placeholder="请输入二级目录名称">
+                <button class="add-subfolder-btn" onclick="removeSubfolderInput(this)">-</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // 移除二级目录输入框
+        function removeSubfolderInput(btn) {
+            const container = document.getElementById('subFolderNamesContainer');
+            const rows = container.querySelectorAll('.subfolder-input-row');
+            if (rows.length > 1) {
+                btn.parentElement.remove();
+            }
+        }
+
+        // 创建二级目录
+        function createSubFolder() {
+            const inputs = document.querySelectorAll('.subfolder-input');
+            const subFolderNames = Array.from(inputs)
+                .map(input => input.value.trim())
+                .filter(name => name);
+            
+            if (subFolderNames.length === 0) {
+                alert('请输入至少一个二级目录名称');
+                return;
+            }
+            
+            if (currentRightClickFolder && mockArchiveTree[currentRightClickFolder]) {
+                subFolderNames.forEach(name => {
+                    mockArchiveTree[currentRightClickFolder].push({ 
+                        name: name, 
+                        date: new Date().toISOString().split('T')[0], 
+                        size: '0KB', 
+                        remark: '' 
+                    });
+                });
+                
+                alert(`成功添加 ${subFolderNames.length} 个二级目录！`);
+                closeModal('newSubFolderModal');
+                renderArchiveTree(currentPerson);
+            } else {
+                alert('请先选择上级目录');
+            }
+        }
+
+        // 打开修改文件夹名称弹窗
+        function openRenameFolderModal() {
+            document.getElementById('originalFolderName').textContent = currentRightClickFolder || '未知目录';
+            document.getElementById('newFolderNameInput').value = '';
+            document.getElementById('contextMenu').style.display = 'none';
+            openModal('renameFolderModal');
+        }
+
+        // 修改文件夹名称
+        function renameFolder() {
+            const newName = document.getElementById('newFolderNameInput').value.trim();
+            const oldName = currentRightClickFolder;
+            
+            if (!newName) {
+                alert('请输入新文件夹名称');
+                return;
+            }
+            
+            if (newName === oldName) {
+                alert('新名称与原名称相同');
+                return;
+            }
+            
+            // 检查新名称是否已存在
+            if (mockArchiveTree[newName]) {
+                alert('该文件夹名称已存在');
+                return;
+            }
+            
+            // 重命名文件夹
+            mockArchiveTree[newName] = mockArchiveTree[oldName];
+            delete mockArchiveTree[oldName];
+            
+            // 更新所有相关文件的category
+            mockArchiveTree[newName].forEach(file => {
+                file.category = newName;
+            });
+            
+            renderArchiveTree(currentPerson);
+            closeModal('renameFolderModal');
+            alert('文件夹名称修改成功');
+        }
+
+        // 打开修改文件名称弹窗
+        function openRenameFileModal() {
+            document.getElementById('originalFileName').textContent = currentRightClickFile || '未知文件';
+            document.getElementById('newFileNameInput').value = '';
+            document.getElementById('contextMenu').style.display = 'none';
+            openModal('renameFileModal');
+        }
+
+        // 修改文件名称
+        function renameFile() {
+            const newName = document.getElementById('newFileNameInput').value.trim();
+            const oldName = currentRightClickFile;
+            const category = currentRightClickFileCategory;
+            
+            if (!newName) {
+                alert('请输入新文件名称');
+                return;
+            }
+            
+            if (newName === oldName) {
+                alert('新名称与原名称相同');
+                return;
+            }
+            
+            // 检查新名称是否已存在
+            const files = mockArchiveTree[category];
+            if (files && files.some(f => f.name === newName)) {
+                alert('该文件名称已存在');
+                return;
+            }
+            
+            // 查找并修改文件名称
+            if (files) {
+                const fileIndex = files.findIndex(f => f.name === oldName);
+                if (fileIndex !== -1) {
+                    files[fileIndex].name = newName;
+                    renderArchiveTree(currentPerson);
+                    closeModal('renameFileModal');
+                    alert('文件名称修改成功');
+                } else {
+                    alert('未找到该文件');
+                }
+            }
+        }
+
+        // 预览文件
+        function previewFile(fileName, fileSize) {
+            document.getElementById('previewFileName').textContent = fileName;
+            document.getElementById('previewFileSize').textContent = fileSize;
+            document.getElementById('previewContent').innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">📄</div>
+                    <p style="font-size: 16px; color: #666;">文件预览功能</p>
+                    <p style="font-size: 13px; color: #999; margin-top: 8px;">${fileName}</p>
+                    <p style="font-size: 13px; color: #999;">${fileSize}</p>
+                    <div style="margin-top: 30px; padding: 20px; background: #f0f0f0; border-radius: 8px;">
+                        <p style="font-size: 14px; line-height: 1.8; color: #666;">
+                            这是文件预览区域。实际系统中将在此处显示Word或PDF文件内容。
+                            支持在线预览、缩放、翻页等操作。
+                        </p>
+                    </div>
+                </div>
+            `;
+            openModal('previewModal');
+        }
+
+        // 下载文件
+        function downloadFile() {
+            const fileName = document.getElementById('previewFileName').textContent;
+            alert(`正在下载: ${fileName}`);
+            closeModal('previewModal');
+        }
+
+        // 按文件名下载
+        function downloadFileByName(fileName) {
+            alert(`正在下载: ${fileName}`);
+        }
+
+        // 删除文件
+        function deleteFile(fileName) {
+            if (confirm(`确定要删除 "${fileName}" 吗？`)) {
+                alert(`已删除: ${fileName}`);
+                renderArchiveTree(currentPerson);
+            }
+        }
+
+        // 分页函数
+        let currentPage = 1;
+        const pageSize = 20;
+
+        function getTotalPages() {
+            return Math.ceil((filteredPersons.length || allPersons.length || mockPersons.length) / pageSize);
+        }
+
+        function updatePagination() {
+            const totalPages = getTotalPages();
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('pageJumpInput').value = currentPage;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePagination();
+                renderPersonListPage(currentPage);
+            }
+        }
+
+        function nextPage() {
+            const totalPages = getTotalPages();
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePagination();
+                renderPersonListPage(currentPage);
+            }
+        }
+
+        function jumpToPage() {
+            const totalPages = getTotalPages();
+            const targetPage = parseInt(document.getElementById('pageJumpInput').value);
+            if (targetPage >= 1 && targetPage <= totalPages) {
+                currentPage = targetPage;
+                updatePagination();
+                renderPersonListPage(currentPage);
+            } else {
+                alert(`请输入有效页码（1-${totalPages}）`);
+                document.getElementById('pageJumpInput').value = currentPage;
+            }
+        }
+
+        function renderPersonListPage(page) {
+            const persons = filteredPersons.length > 0 ? filteredPersons : (allPersons.length > 0 ? allPersons : mockPersons);
+            const start = (page - 1) * pageSize;
+            const end = start + pageSize;
+            const pagePersons = persons.slice(start, end);
+            
+            const container = document.getElementById('personList');
+            container.innerHTML = pagePersons.map(person => `
+                <div class="person-item" data-id="${person.id}" onclick="selectPerson('${person.id}')">
+                    <div class="person-avatar">${person.name.charAt(0)}</div>
+                    <div class="person-info">
+                        <div class="person-name">${person.name}</div>
+                        <div class="person-dept">${person.dept}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            if (currentPerson) {
+                const selectedItem = document.querySelector(`.person-item[data-id="${currentPerson.id}"]`);
+                if (selectedItem) {
+                    selectedItem.classList.add('active');
+                }
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initPage();
+            updatePagination();
+        });
+    </script>
+</body>
+</html>

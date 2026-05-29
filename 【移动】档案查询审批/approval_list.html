@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>人事档案查（借）阅审批</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: linear-gradient(135deg, #4A8CDE 0%, #357ABD 100%);
+        }
+
+        .nav-header {
+            background: linear-gradient(135deg, #4A8CDE 0%, #357ABD 100%);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .nav-left {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-icon {
+            width: 20px;
+            height: 20px;
+            border-left: 3px solid #fff;
+            border-bottom: 3px solid #fff;
+            transform: rotate(45deg);
+            margin-left: 8px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-right {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tabs-container {
+            background: #fff;
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px 0;
+            text-align: center;
+            font-size: 15px;
+            color: #666;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab.active {
+            color: #4A8CDE;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: #4A8CDE;
+            border-radius: 2px;
+        }
+
+        .list-container {
+            padding: 10px;
+        }
+
+        .list-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .list-item:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .apply-no {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-tag.pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-tag.approved {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-tag.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        .apply-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .arrow-icon {
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #ccc;
+            border-top: 2px solid #ccc;
+            transform: rotate(45deg);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .empty-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #ccc;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .footer-safe {
+            height: 34px;
+        }
+
+        .filter-container {
+            background: #fff;
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 16px;
+            margin-bottom: 12px;
+        }
+
+        .search-icon {
+            width: 16px;
+            height: 16px;
+            border-right: 2px solid #999;
+            border-bottom: 2px solid #999;
+            transform: rotate(-45deg);
+            margin-right: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .filter-main-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-section {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #4A8CDE;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background: #357ABD;
+        }
+
+        .reset-btn {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .search-btn {
+            width: 32px;
+            height: 32px;
+            background: #4A8CDE;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .search-btn::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            transform: rotate(-45deg);
+            top: 9px;
+            left: 10px;
+        }
+
+        .multi-select {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .select-value {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .select-arrow {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #999;
+            transition: transform 0.2s;
+        }
+
+        .multi-select.active .select-arrow {
+            transform: rotate(180deg);
+        }
+
+        .multi-options {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            min-width: 180px;
+        }
+
+        .multi-options.show {
+            display: block;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            border-radius: 4px;
+        }
+
+        .option-item:hover {
+            background: #f5f5f5;
+        }
+
+        .option-item input[type="checkbox"] {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .date-separator {
+            color: #999;
+            font-size: 14px;
+        }
+
+        
+
+        .sort-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid #4A8CDE;
+            border-radius: 8px;
+            background: #fff;
+            color: #4A8CDE;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sort-btn:hover {
+            background: #f0f7ff;
+        }
+
+        .sort-btn.active {
+            background: #4A8CDE;
+            color: #fff;
+        }
+
+        .sort-text {
+            font-weight: 500;
+        }
+
+        .sort-icon {
+            font-size: 12px;
+        }
+
+        .filter-item {
+            position: relative;
+        }
+
+        .pagination-container {
+            padding: 20px 16px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fff;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #f5f5f5;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 14px;
+            color: #666;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .jump-text {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .jump-input {
+            width: 50px;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+        }
+
+        .jump-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #4A8CDE;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .jump-btn:hover {
+            background: #357ABD;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar"></div>
+    
+    <div class="nav-header">
+        <div class="nav-left" onclick="goBack()">
+            <div class="back-icon"></div>
+        </div>
+        <div class="nav-title">人事档案查（借）阅审批</div>
+        <div class="nav-right"></div>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tab active" onclick="switchTab('pending')">待审批</div>
+        <div class="tab" onclick="switchTab('approved')">已审批</div>
+    </div>
+
+    <div class="filter-container">
+        <div class="search-bar">
+            <div class="search-icon"></div>
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索申请人、被查阅人、编号...">
+            <button class="search-btn" onclick="handleSearch()"></button>
+        </div>
+        
+        <div class="filter-main-row">
+            <div class="filter-section">
+                <label class="filter-label">申请类型</label>
+                <div class="multi-select" onclick="toggleMultiSelect('type')">
+                    <span class="select-value" id="typeValue">全部</span>
+                    <div class="select-arrow"></div>
+                </div>
+                <div class="multi-options" id="typeOptions">
+                    <label class="option-item">
+                        <input type="checkbox" value="查阅纸质人事档案">查阅纸质人事档案
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" value="查阅数字人事档案">查阅数字人事档案
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" value="借阅纸质人事档案">借阅纸质人事档案
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" value="复制档案材料">复制档案材料
+                    </label>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <label class="filter-label">申请时间</label>
+                <div class="date-range">
+                    <input type="datetime-local" class="date-input" id="startDate" placeholder="开始时间">
+                    <span class="date-separator">至</span>
+                    <input type="datetime-local" class="date-input" id="endDate" placeholder="结束时间">
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <label class="filter-label">单位</label>
+                <div class="multi-select" onclick="toggleMultiSelect('unit')">
+                    <span class="select-value" id="unitValue">全部</span>
+                    <div class="select-arrow"></div>
+                </div>
+                <div class="multi-options" id="unitOptions">
+                    <label class="option-item">
+                        <input type="checkbox" value="总行人力资源部">总行人力资源部
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" value="北京分行">北京分行
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" value="上海分行">上海分行
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" value="广州分行">广州分行
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="filter-action-row">
+            <button class="sort-btn" id="sortBtn" onclick="toggleSort()">
+                <span class="sort-text">按时间排序</span>
+                <span class="sort-icon" id="sortIcon">↑↓</span>
+            </button>
+            <div class="action-buttons">
+                <button class="reset-btn" onclick="resetFilter()">重置</button>
+                <button class="filter-btn" onclick="applyFilter()">筛选</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-container" id="pendingList">
+        <div class="list-item" onclick="goToDetail('SQ20240623001')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240623001</span>
+                <span class="status-tag pending">待审批</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">张三</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">查阅纸质人事档案</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">王五</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">总行人力资源部</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-23 10:30:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+
+        <div class="list-item" onclick="goToDetail('SQ20240623002')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240623002</span>
+                <span class="status-tag pending">待审批</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">李四</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">查阅数字人事档案</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">赵六</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">北京分行</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-23 09:15:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+
+        <div class="list-item" onclick="goToDetail('SQ20240622003')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240622003</span>
+                <span class="status-tag pending">待审批</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">张三</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">借阅纸质人事档案</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">孙七</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">总行人力资源部</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-22 14:20:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+
+        <div class="list-item" onclick="goToDetail('SQ20240622004')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240622004</span>
+                <span class="status-tag pending">待审批</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">王五</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">复制档案材料</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">周八</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">上海分行</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-22 11:00:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+
+        <div class="list-item" onclick="goToDetail('SQ20240621005')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240621005</span>
+                <span class="status-tag pending">待审批</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">赵六</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">查阅纸质人事档案</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">吴九</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">广州分行</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-21 16:45:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-container" id="approvedList" style="display: none;">
+        <div class="list-item" onclick="goToDetail('SQ20240620001')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240620001</span>
+                <span class="status-tag approved">已通过</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">张三</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">查阅数字人事档案</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">王五</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">总行人力资源部</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-20 09:00:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+
+        <div class="list-item" onclick="goToDetail('SQ20240619002')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240619002</span>
+                <span class="status-tag approved">已通过</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">李四</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">借阅纸质人事档案</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">赵六</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">北京分行</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-19 14:30:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+
+        <div class="list-item" onclick="goToDetail('SQ20240618003')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240618003</span>
+                <span class="status-tag rejected">已驳回</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">王五</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">复制档案材料</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">孙七</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">上海分行</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-18 10:15:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+
+        <div class="list-item" onclick="goToDetail('SQ20240617004')">
+            <div class="item-header">
+                <span class="apply-no">SQ20240617004</span>
+                <span class="status-tag approved">已通过</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">申请人</span>
+                    <span class="info-value">赵六</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">申请类型</span>
+                    <span class="info-value">查阅纸质人事档案</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">被查阅人</span>
+                    <span class="info-value">周八</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">单位</span>
+                    <span class="info-value">广州分行</span>
+                </div>
+            </div>
+            <div class="item-footer">
+                <span class="apply-time">2024-06-17 16:00:00</span>
+                <div class="arrow-icon"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pagination-container">
+        <div class="pagination">
+            <button class="page-btn" id="firstPage" onclick="goToFirstPage()">首页</button>
+            <button class="page-btn" id="prevPage" onclick="goToPrevPage()">上一页</button>
+            <span class="page-info">第 <span id="currentPage">1</span> / <span id="totalPages">2</span> 页</span>
+            <button class="page-btn" id="nextPage" onclick="goToNextPage()">下一页</button>
+            <button class="page-btn" id="lastPage" onclick="goToLastPage()">末页</button>
+            <span class="jump-text">跳转到</span>
+            <input type="number" class="jump-input" id="jumpInput" min="1" max="2" value="1">
+            <button class="jump-btn" onclick="jumpToPage()">跳转</button>
+        </div>
+    </div>
+
+    <div class="footer-safe"></div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function goToDetail(applyNo) {
+            window.location.href = 'file_review.html?applyNo=' + applyNo;
+        }
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const pendingList = document.getElementById('pendingList');
+            const approvedList = document.getElementById('approvedList');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tabName === 'pending') {
+                pendingList.style.display = 'block';
+                approvedList.style.display = 'none';
+            } else {
+                pendingList.style.display = 'none';
+                approvedList.style.display = 'block';
+            }
+        }
+
+        function toggleMultiSelect(type) {
+            const optionsId = type + 'Options';
+            const options = document.getElementById(optionsId);
+            const select = document.querySelector(`[onclick="toggleMultiSelect('${type}')"]`);
+            
+            document.querySelectorAll('.multi-options').forEach(opt => {
+                if (opt.id !== optionsId) opt.classList.remove('show');
+            });
+            document.querySelectorAll('.multi-select').forEach(s => s.classList.remove('active'));
+            
+            options.classList.toggle('show');
+            select.classList.toggle('active');
+            
+            if (!options.classList.contains('show')) {
+                updateMultiSelectValue(type);
+            }
+        }
+
+        function updateMultiSelectValue(type) {
+            const optionsId = type + 'Options';
+            const valueId = type + 'Value';
+            const checkboxes = document.querySelectorAll('#' + optionsId + ' input[type="checkbox"]');
+            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            
+            const valueEl = document.getElementById(valueId);
+            if (selected.length === 0) {
+                valueEl.textContent = '全部';
+            } else if (selected.length === 1) {
+                valueEl.textContent = selected[0];
+            } else {
+                valueEl.textContent = `已选${selected.length}项`;
+            }
+        }
+
+        function handleSearch() {
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            const typeCheckboxes = document.querySelectorAll('#typeOptions input[type="checkbox"]');
+            const selectedTypes = Array.from(typeCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            
+            const unitCheckboxes = document.querySelectorAll('#unitOptions input[type="checkbox"]');
+            const selectedUnits = Array.from(unitCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            
+            const lists = ['pendingList', 'approvedList'];
+            
+            lists.forEach(listId => {
+                const items = document.querySelectorAll('#' + listId + ' .list-item');
+                items.forEach(item => {
+                    const applyNo = item.querySelector('.apply-no').textContent.toLowerCase();
+                    const applicant = item.querySelector('.info-value:nth-child(2)').textContent.toLowerCase();
+                    const searchTarget = item.querySelector('.info-value:nth-child(4)')?.textContent.toLowerCase() || '';
+                    const itemType = item.querySelector('.info-value:nth-child(3)').textContent;
+                    const itemUnit = item.querySelector('.info-value:nth-child(5)')?.textContent || '';
+                    const itemTime = item.querySelector('.apply-time').textContent;
+                    const itemTimeFormatted = formatDateTime(itemTime);
+                    
+                    let match = true;
+                    
+                    if (keyword && !applyNo.includes(keyword) && !applicant.includes(keyword) && !searchTarget.includes(keyword)) {
+                        match = false;
+                    }
+                    
+                    if (selectedTypes.length > 0 && !selectedTypes.includes(itemType)) {
+                        match = false;
+                    }
+                    
+                    if (selectedUnits.length > 0 && !selectedUnits.includes(itemUnit)) {
+                        match = false;
+                    }
+                    
+                    if (startDate && itemTimeFormatted < startDate) {
+                        match = false;
+                    }
+                    
+                    if (endDate && itemTimeFormatted > endDate) {
+                        match = false;
+                    }
+                    
+                    item.style.display = match ? 'block' : 'none';
+                });
+            });
+        }
+
+        function formatDateTime(dateTimeStr) {
+            const parts = dateTimeStr.split(' ');
+            const dateParts = parts[0].split('-');
+            const timeParts = parts[1] ? parts[1].split(':') : ['00', '00', '00'];
+            return `${dateParts[0]}-${dateParts[1].padStart(2, '0')}-${dateParts[2].padStart(2, '0')}T${timeParts[0].padStart(2, '0')}:${timeParts[1].padStart(2, '0')}`;
+        }
+
+        var sortOrder = 'desc';
+
+        function toggleSort() {
+            const sortBtn = document.getElementById('sortBtn');
+            const sortIcon = document.getElementById('sortIcon');
+            
+            if (sortOrder === 'desc') {
+                sortOrder = 'asc';
+                sortIcon.textContent = '↑';
+            } else {
+                sortOrder = 'desc';
+                sortIcon.textContent = '↓';
+            }
+            
+            sortBtn.classList.toggle('active');
+            sortItems();
+        }
+
+        function sortItems() {
+            const lists = ['pendingList', 'approvedList'];
+            
+            lists.forEach(listId => {
+                const list = document.getElementById(listId);
+                if (list.style.display !== 'block') return;
+                
+                const items = Array.from(list.querySelectorAll('.list-item'));
+                
+                items.sort((a, b) => {
+                    const timeA = a.querySelector('.apply-time').textContent;
+                    const timeB = b.querySelector('.apply-time').textContent;
+                    
+                    if (sortOrder === 'desc') {
+                        return new Date(timeB).getTime() - new Date(timeA).getTime();
+                    } else {
+                        return new Date(timeA).getTime() - new Date(timeB).getTime();
+                    }
+                });
+                
+                items.forEach(item => list.appendChild(item));
+            });
+            
+            updatePageDisplay();
+        }
+
+        function resetFilter() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            
+            document.querySelectorAll('#typeOptions input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#unitOptions input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            document.getElementById('typeValue').textContent = '全部';
+            document.getElementById('unitValue').textContent = '全部';
+            
+            document.querySelectorAll('.multi-options').forEach(opt => opt.classList.remove('show'));
+            document.querySelectorAll('.multi-select').forEach(s => s.classList.remove('active'));
+            
+            const pendingItems = document.querySelectorAll('#pendingList .list-item');
+            pendingItems.forEach(item => item.style.display = 'block');
+            
+            const approvedItems = document.querySelectorAll('#approvedList .list-item');
+            approvedItems.forEach(item => item.style.display = 'block');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.filter-item')) {
+                document.querySelectorAll('.multi-options').forEach(opt => opt.classList.remove('show'));
+                document.querySelectorAll('.multi-select').forEach(s => s.classList.remove('active'));
+            }
+        });
+
+        var currentPage = 1;
+        var totalPages = 2;
+
+        function updatePagination() {
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('firstPage').disabled = currentPage === 1;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            document.getElementById('lastPage').disabled = currentPage === totalPages;
+            document.getElementById('jumpInput').value = currentPage;
+        }
+
+        function goToFirstPage() {
+            if (currentPage > 1) {
+                currentPage = 1;
+                updatePagination();
+                updatePageDisplay();
+            }
+        }
+
+        function goToPrevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePagination();
+                updatePageDisplay();
+            }
+        }
+
+        function goToNextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePagination();
+                updatePageDisplay();
+            }
+        }
+
+        function goToLastPage() {
+            if (currentPage < totalPages) {
+                currentPage = totalPages;
+                updatePagination();
+                updatePageDisplay();
+            }
+        }
+
+        function jumpToPage() {
+            var pageNum = parseInt(document.getElementById('jumpInput').value);
+            if (pageNum >= 1 && pageNum <= totalPages && pageNum !== currentPage) {
+                currentPage = pageNum;
+                updatePagination();
+                updatePageDisplay();
+            }
+        }
+
+        function updatePageDisplay() {
+            var items = document.querySelectorAll('.list-item');
+            items.forEach((item, index) => {
+                var itemsPerPage = 5;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                item.style.display = (index >= startIndex && index < endIndex) ? 'block' : 'none';
+            });
+        }
+
+        updatePagination();
+        updatePageDisplay();
+    </script>
+</body>
+</html>
