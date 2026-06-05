@@ -377,15 +377,12 @@
             font-weight: 800;
             color: #1e3a5f;
             letter-spacing: 1px;
-            line-height: 1.2;
         }
 
         .landing-desc {
-            margin: 14px auto 0;
+            margin-top: 10px;
             font-size: 14px;
             color: #667085;
-            line-height: 1.8;
-            max-width: 680px;
         }
 
         .ai-search-container {
@@ -461,7 +458,7 @@
             justify-content: center;
             gap: 10px;
             flex-wrap: wrap;
-            margin-top: 16px;
+            margin-top: 12px;
         }
 
         .ai-filter-btn {
@@ -503,7 +500,7 @@
             text-align: center;
             font-size: 12px;
             color: #98a2b3;
-            margin-top: 14px;
+            margin-top: 10px;
         }
 
         .results-view {
@@ -928,26 +925,24 @@
             line-height: 1;
         }
 
-        .compare-modal-overlay.fullscreen {
-            background: #fff;
-            padding: 0;
-            align-items: stretch;
-        }
-
-        .compare-modal-overlay.fullscreen.show {
-            justify-content: center;
-        }
-
-        .compare-modal-overlay.fullscreen .compare-modal {
+        .compare-modal.fullscreen {
+            width: 100%;
+            max-width: 100%;
             height: 100vh;
             max-height: 100vh;
-            width: 95%;
-            max-width: 1400px;
             border-radius: 0;
         }
 
-        .compare-modal-overlay.fullscreen .compare-modal-body {
+        .compare-modal.fullscreen .compare-modal-body {
             padding: 24px;
+        }
+
+        .compare-modal.fullscreen .compare-cards {
+            height: calc(100vh - 56px - 24px - 24px);
+        }
+
+        .compare-modal.fullscreen .compare-card {
+            flex: 0 0 calc(100vw - 48px);
         }
 
         .compare-modal-body {
@@ -2162,18 +2157,18 @@
         }
 
         function toggleCompareFullscreen() {
-            const overlay = document.getElementById('compareModal');
+            const modal = document.querySelector('.compare-modal');
             if (!document.fullscreenElement) {
-                if (overlay && overlay.requestFullscreen) {
-                    overlay.requestFullscreen();
-                    overlay.classList.add('fullscreen');
+                if (modal && modal.requestFullscreen) {
+                    modal.requestFullscreen();
+                    modal.classList.add('fullscreen');
                 }
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 }
-                if (overlay) {
-                    overlay.classList.remove('fullscreen');
+                if (modal) {
+                    modal.classList.remove('fullscreen');
                 }
             }
         }
@@ -2233,13 +2228,6 @@
                     aiSearch();
                 }
             });
-        });
-
-        document.addEventListener('fullscreenchange', () => {
-            const overlay = document.getElementById('compareModal');
-            if (!document.fullscreenElement && overlay) {
-                overlay.classList.remove('fullscreen');
-            }
         });
     </script>
 </body>
