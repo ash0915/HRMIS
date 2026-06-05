@@ -1641,6 +1641,15 @@
             return str;
         }
 
+        function getHighestEducationDisplay(person) {
+            const tags = person?.tags || [];
+            const tier = tags.includes('985') ? '985' : (tags.includes('211') ? '211' : (tags.includes('普通高校') ? '普通' : ''));
+            const edu = person?.education || '';
+            const degree = edu.includes('博士') ? '博士' : (edu.includes('硕士') ? '硕士' : (edu.includes('本科') ? '本科' : edu));
+            if (!tier) return degree;
+            return `${tier}高校${degree}`;
+        }
+
         function getTagCloudStyle(index) {
             const styles = [
                 'top:8%;left:50%;',
@@ -1768,7 +1777,7 @@
             Array.from(selectedCompareDims).forEach(dim => {
                 let value = '—';
                 let html = '';
-                if (dim === '学历') value = person.education;
+                if (dim === '学历') value = getHighestEducationDisplay(person);
                 if (dim === '政治面貌') value = person.political;
                 if (dim === '绩效') {
                     html = renderPerformanceYearly(person.performanceYearly);
@@ -1963,14 +1972,14 @@
                     <td>${person.position}</td>
                     <td>${person.gender}</td>
                     <td>${person.age}</td>
-                    <td>${person.education}</td>
+                    <td>${getHighestEducationDisplay(person)}</td>
                     <td>${person.empType}</td>
                     <td>${person.political}</td>
                     <td><div class="tag-badge">${person.tags.map(t => `<span>${t}</span>`).join('')}</div></td>
                     <td>
                         <div class="action-buttons">
                             <button class="action-btn resume" onclick="viewResume(${person.id})">📋 简历</button>
-                            ${person.isCadre ? `<button class="action-btn profile" onclick="viewProfile(${person.id})">👤 画像</button>` : ''}
+                            <button class="action-btn profile" onclick="viewProfile(${person.id})">👤 画像</button>
                             <button class="action-btn archive" onclick="viewArchive(${person.id})">📁 档案</button>
                         </div>
                     </td>
