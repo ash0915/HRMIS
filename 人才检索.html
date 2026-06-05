@@ -910,7 +910,7 @@
         }
 
         .compare-card {
-            flex: 0 0 280px;
+            flex: 0 0 560px;
             background: #fff;
             border-radius: 8px;
             border: 1px solid #e0e0e0;
@@ -923,17 +923,17 @@
             border-bottom: 1px solid #f0f0f0;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 24px;
         }
 
         .compare-card-bottom {
             padding: 14px 16px 16px;
             overflow: auto;
-            max-height: 180px;
+            max-height: 260px;
         }
 
         .card-left {
-            width: 120px;
+            width: 180px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
@@ -942,14 +942,14 @@
 
         .avatar-cloud {
             position: relative;
-            width: 100px;
-            height: 100px;
-            margin-bottom: 10px;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 14px;
         }
 
         .card-avatar {
-            width: 80px;
-            height: 80px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
@@ -960,8 +960,8 @@
             font-weight: 600;
             overflow: hidden;
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 25px;
+            left: 25px;
         }
 
         .card-avatar img {
@@ -980,11 +980,11 @@
 
         .tag-cloud span {
             position: absolute;
-            padding: 3px 8px;
+            padding: 4px 10px;
             background: rgba(230, 240, 255, 0.95);
             color: #2c5c97;
             border-radius: 999px;
-            font-size: 11px;
+            font-size: 12px;
             line-height: 1;
             white-space: nowrap;
             transform: translate(-50%, -50%);
@@ -1012,8 +1012,8 @@
 
         .card-basic {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 12px;
+            grid-template-columns: 1fr;
+            gap: 10px;
         }
 
         .basic-item {
@@ -1047,18 +1047,23 @@
 
         .compare-dimensions {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            min-width: 260px;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 360px;
         }
 
         .dimension-chip {
-            padding: 4px 10px;
+            padding: 10px 12px;
             background: #f5f7fa;
             border: 1px solid #e6e6e6;
-            border-radius: 999px;
+            border-radius: 10px;
             font-size: 12px;
             color: #344054;
+            width: fit-content;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .compare-dim-select {
