@@ -360,32 +360,115 @@
             border-bottom: none;
         }
 
+        .landing-hero {
+            text-align: center;
+            padding: 28px 0 10px;
+        }
+
+        .landing-title {
+            font-size: 34px;
+            font-weight: 800;
+            color: #1e3a5f;
+            letter-spacing: 1px;
+        }
+
+        .landing-desc {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #667085;
+        }
+
         .ai-search-container {
-            position: relative;
             max-width: 800px;
             margin: 0 auto;
         }
 
-        .ai-search-container input {
+        .ai-search-box {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
             width: 100%;
-            padding: 14px 60px 14px 20px;
+            padding: 10px 14px;
             border: 2px solid #e0e0e0;
-            border-radius: 40px;
-            font-size: 15px;
+            border-radius: 18px;
+            background: #fff;
             transition: border-color 0.2s;
         }
 
-        .ai-search-container input:focus {
-            outline: none;
+        .ai-search-box:focus-within {
             border-color: #2c5c97;
         }
 
+        .selected-tag-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #e6f0ff;
+            color: #2c5c97;
+            border-radius: 999px;
+            font-size: 12px;
+            line-height: 1;
+            user-select: none;
+        }
+
+        .tag-chip-remove {
+            width: 18px;
+            height: 18px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            background: rgba(44, 92, 151, 0.15);
+            color: #2c5c97;
+            font-size: 14px;
+            line-height: 18px;
+            padding: 0;
+        }
+
+        .ai-search-box input {
+            flex: 1;
+            min-width: 260px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            padding: 6px 0;
+            background: transparent;
+        }
+
+        .ai-search-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .ai-filter-btn {
+            padding: 8px 14px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #2c5c97;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-filter-btn:hover {
+            background: #f5f7fa;
+        }
+
         .ai-search-btn {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 8px 24px;
+            padding: 8px 18px;
             background: linear-gradient(135deg, #2c5c97 0%, #1a3d6e 100%);
             color: #fff;
             border: none;
@@ -393,7 +476,7 @@
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
         }
@@ -405,9 +488,83 @@
         .ai-hint {
             text-align: center;
             font-size: 12px;
-            color: #999;
-            margin-top: 8px;
+            color: #98a2b3;
+            margin-top: 10px;
         }
+
+        .results-view {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .filter-drawer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1200;
+        }
+
+        .filter-drawer-overlay.show {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .filter-drawer {
+            width: 380px;
+            max-width: 92vw;
+            height: 100vh;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .filter-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .filter-drawer-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+
+        .filter-drawer-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #f5f7fa;
+            color: #667085;
+            font-size: 20px;
+            line-height: 32px;
+            padding: 0;
+        }
+
+        .filter-drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .filter-drawer-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+        }
+
 
         /* 工具栏 */
         .toolbar {
@@ -892,106 +1049,117 @@
         </div>
     </div>
 
-    <!-- 侧边栏切换按钮 -->
-    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
-        <span>◀</span>
-    </button>
-
     <!-- 主体内容 -->
     <div class="main-container">
-        <!-- 左侧标签筛选面板 -->
-        <div class="left-panel" id="leftPanel">
-            <div class="panel-header">
-                <h3>标签筛选</h3>
-            </div>
-            
-            <div class="tag-categories" id="tagCategories">
-                <!-- 标签分类将通过JS动态生成 -->
-            </div>
-            
-            <div class="search-action">
-                <button class="btn btn-secondary" onclick="clearFilters()">清除筛选</button>
-                <button class="btn btn-success" onclick="addItem()">添加</button>
-                <button class="btn btn-primary" onclick="applyFilters()">检索</button>
-            </div>
-        </div>
-
         <!-- 右侧内容区 -->
         <div class="right-panel">
             <!-- AI搜索头部 -->
             <div class="search-header">
+                <div class="landing-hero" id="landingHero">
+                    <div class="landing-title">人才检索</div>
+                    <div class="landing-desc">你用自然语言说说想找什么样的人才，我来帮你智能匹配并筛出最合适的候选人。</div>
+                </div>
                 <div class="ai-search-container">
-                    <input type="text" id="aiSearchInput" placeholder="输入自然语言查询，如：35岁以下博士学历的年轻干部" />
-                    <button class="ai-search-btn" onclick="aiSearch()">
-                        <span>🤖</span> AI检索
-                    </button>
+                    <div class="ai-search-box">
+                        <div class="selected-tag-chips" id="selectedTagChips"></div>
+                        <input type="text" id="aiSearchInput" placeholder="输入自然语言描述，例如：35岁以下博士学历的年轻干部" />
+                    </div>
+                    <div class="ai-search-actions">
+                        <button class="ai-filter-btn" onclick="openFilterDrawer()">
+                            <span>🏷</span> 标签筛选
+                        </button>
+                        <button class="ai-search-btn" onclick="aiSearch()">
+                            <span>🤖</span> 智能匹配
+                        </button>
+                    </div>
                 </div>
-                <div class="ai-hint">支持自然语言搜索，基于我行AI能力对员工数据进行智能分析</div>
+                <div class="ai-hint" id="aiHint">支持“标签筛选 + 自然语言描述”，选完标签会自动回显到输入框旁边。</div>
             </div>
 
-            <!-- 工具栏 -->
-            <div class="toolbar">
-                <div class="toolbar-left">
-                    <span class="result-count" id="resultCount">共 0 条记录</span>
-                    <span class="selected-count" id="selectedCount">已选 0 人</span>
-                    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666;">
-                        <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" /> 全选
-                    </label>
+            <div class="results-view" id="resultsView">
+                <!-- 工具栏 -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <span class="result-count" id="resultCount">共 0 条记录</span>
+                        <span class="selected-count" id="selectedCount">已选 0 人</span>
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666;">
+                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" /> 全选
+                        </label>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="btn btn-compare" id="compareBtn" onclick="openCompareModal()" disabled>
+                            <span>🔄</span> 人才对比
+                        </button>
+                        <button class="btn btn-success" onclick="addItem()">
+                            <span>➕</span> 添加
+                        </button>
+                        <button class="btn btn-secondary">
+                            <span>📊</span> 导出Excel
+                        </button>
+                    </div>
                 </div>
-                <div class="toolbar-actions">
-                    <button class="btn btn-compare" id="compareBtn" onclick="openCompareModal()" disabled>
-                        <span>🔄</span> 人才对比
-                    </button>
-                    <button class="btn btn-secondary">
-                        <span>📊</span> 导出Excel
-                    </button>
+
+                <!-- 人员列表 -->
+                <div class="person-list-container">
+                    <div class="table-scroll-wrapper">
+                        <table class="person-table" id="personTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" id="headerCheckbox" onclick="toggleSelectAll()" />
+                                    </th>
+                                    <th>工号</th>
+                                    <th>姓名</th>
+                                    <th>单位</th>
+                                    <th>部门</th>
+                                    <th>部室</th>
+                                    <th>岗位</th>
+                                    <th>性别</th>
+                                    <th>年龄</th>
+                                    <th>最高学历</th>
+                                    <th>婚姻状况</th>
+                                    <th>员工类别</th>
+                                    <th>政治面貌</th>
+                                    <th>标签</th>
+                                    <th style="width: 140px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="personTableBody">
+                                <!-- 人员数据将通过JS动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 分页 -->
+                <div class="pagination" id="pagination">
+                    <button onclick="firstPage()" id="firstBtn" disabled>首页</button>
+                    <button onclick="prevPage()" id="prevBtn" disabled>上一页</button>
+                    <span class="page-info" id="pageInfo">第 1 / 1 页</span>
+                    <button onclick="nextPage()" id="nextBtn">下一页</button>
+                    <button onclick="lastPage()" id="lastBtn">末页</button>
+                    <div class="page-jump">
+                        <span>跳转到</span>
+                        <input type="number" id="jumpPage" min="1" value="1" />
+                        <button class="jump-btn" onclick="jumpToPage()">跳转</button>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- 人员列表 -->
-            <div class="person-list-container">
-                <div class="table-scroll-wrapper">
-                    <table class="person-table" id="personTable">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;">
-                                    <input type="checkbox" id="headerCheckbox" onclick="toggleSelectAll()" />
-                                </th>
-                                <th>工号</th>
-                                <th>姓名</th>
-                                <th>单位</th>
-                                <th>部门</th>
-                                <th>部室</th>
-                                <th>岗位</th>
-                                <th>性别</th>
-                                <th>年龄</th>
-                                <th>最高学历</th>
-                                <th>婚姻状况</th>
-                                <th>员工类别</th>
-                                <th>政治面貌</th>
-                                <th>标签</th>
-                                <th style="width: 140px;">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="personTableBody">
-                            <!-- 人员数据将通过JS动态生成 -->
-                        </tbody>
-                    </table>
-                </div>
+    <div class="filter-drawer-overlay" id="filterDrawer" onclick="closeFilterDrawerOnOverlay(event)">
+        <div class="filter-drawer">
+            <div class="filter-drawer-header">
+                <div class="filter-drawer-title">标签筛选</div>
+                <button class="filter-drawer-close" onclick="closeFilterDrawer()">×</button>
             </div>
-
-            <!-- 分页 -->
-            <div class="pagination" id="pagination">
-                <button onclick="firstPage()" id="firstBtn" disabled>首页</button>
-                <button onclick="prevPage()" id="prevBtn" disabled>上一页</button>
-                <span class="page-info" id="pageInfo">第 1 / 1 页</span>
-                <button onclick="nextPage()" id="nextBtn">下一页</button>
-                <button onclick="lastPage()" id="lastBtn">末页</button>
-                <div class="page-jump">
-                    <span>跳转到</span>
-                    <input type="number" id="jumpPage" min="1" value="1" />
-                    <button class="jump-btn" onclick="jumpToPage()">跳转</button>
-                </div>
+            <div class="filter-drawer-body">
+                <div class="tag-categories" id="tagCategories"></div>
+            </div>
+            <div class="filter-drawer-footer">
+                <button class="btn btn-secondary" onclick="clearFilters()">清除筛选</button>
+                <button class="btn btn-primary" onclick="confirmFilters()">确定</button>
             </div>
         </div>
     </div>
@@ -1012,21 +1180,7 @@
     </div>
 
     <script>
-        // 侧边栏切换函数
-        function toggleSidebar() {
-            const leftPanel = document.getElementById('leftPanel');
-            const toggleBtn = document.getElementById('sidebarToggle');
-            
-            if (leftPanel.classList.contains('collapsed')) {
-                leftPanel.classList.remove('collapsed');
-                toggleBtn.innerHTML = '<span>◀</span>';
-                toggleBtn.style.left = '320px';
-            } else {
-                leftPanel.classList.add('collapsed');
-                toggleBtn.innerHTML = '<span>▶</span>';
-                toggleBtn.style.left = '0';
-            }
-        }
+        let viewMode = 'landing';
 
         // 标签分类数据
         const tagCategories = [
@@ -1093,12 +1247,32 @@
         let selectedTags = [];
         let selectedPersons = new Set();
 
+        function setViewMode(mode) {
+            viewMode = mode;
+            const hero = document.getElementById('landingHero');
+            const results = document.getElementById('resultsView');
+            const hint = document.getElementById('aiHint');
+            if (mode === 'results') {
+                hero.style.display = 'none';
+                results.style.display = 'flex';
+                hint.style.display = 'none';
+            } else {
+                hero.style.display = 'block';
+                results.style.display = 'none';
+                hint.style.display = 'block';
+            }
+        }
+
         // 初始化标签面板
         function initTagPanel() {
             const container = document.getElementById('tagCategories');
-            tagCategories.forEach((category, categoryIndex) => {
+            container.innerHTML = '';
+            let renderedIndex = 0;
+            tagCategories.forEach((category) => {
                 if (category.tags.length === 0) return;
-                
+                const currentIndex = renderedIndex;
+                renderedIndex += 1;
+
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'tag-category';
                 
@@ -1106,16 +1280,21 @@
                 titleDiv.className = 'category-title';
                 titleDiv.innerHTML = `
                     <span>${category.name}</span>
-                    <span class="category-toggle">▼</span>
+                    <span class="category-toggle expanded">▼</span>
                 `;
-                titleDiv.onclick = () => toggleCategory(categoryIndex);
+                titleDiv.onclick = () => toggleCategory(currentIndex);
                 categoryDiv.appendChild(titleDiv);
                 
                 const tagList = document.createElement('div');
                 tagList.className = 'tag-list';
+                tagList.style.display = 'flex';
                 category.tags.forEach(tag => {
                     const tagItem = document.createElement('label');
                     tagItem.className = 'tag-item';
+                    tagItem.dataset.tag = tag;
+                    if (selectedTags.includes(tag)) {
+                        tagItem.classList.add('selected');
+                    }
                     tagItem.innerHTML = `
                         <span class="tag-checkbox"></span>
                         <span>${tag}</span>
@@ -1139,7 +1318,7 @@
             const toggle = category.querySelector('.category-toggle');
             const tagList = category.querySelector('.tag-list');
             
-            if (tagList.style.display === 'none' || tagList.style.display === '') {
+            if (tagList.style.display === 'none') {
                 tagList.style.display = 'flex';
                 toggle.classList.add('expanded');
             } else {
@@ -1157,6 +1336,61 @@
                 selectedTags.push(tag);
                 element.classList.add('selected');
             }
+            updateSelectedTagChips();
+        }
+
+        function updateSelectedTagChips() {
+            const container = document.getElementById('selectedTagChips');
+            container.innerHTML = '';
+            selectedTags.forEach(tag => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                const label = document.createElement('span');
+                label.textContent = tag;
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'tag-chip-remove';
+                remove.textContent = '×';
+                remove.onclick = () => removeTag(tag);
+                chip.appendChild(label);
+                chip.appendChild(remove);
+                container.appendChild(chip);
+            });
+        }
+
+        function removeTag(tag) {
+            selectedTags = selectedTags.filter(t => t !== tag);
+            document.querySelectorAll('.tag-item').forEach(item => {
+                if (item.dataset.tag === tag) {
+                    item.classList.remove('selected');
+                }
+            });
+            updateSelectedTagChips();
+            if (viewMode === 'results') {
+                selectedPersons.clear();
+                currentPage = 1;
+                renderPersonList();
+            }
+        }
+
+        function openFilterDrawer() {
+            document.getElementById('filterDrawer').classList.add('show');
+        }
+
+        function closeFilterDrawer() {
+            document.getElementById('filterDrawer').classList.remove('show');
+        }
+
+        function closeFilterDrawerOnOverlay(event) {
+            if (event.target && event.target.id === 'filterDrawer') {
+                closeFilterDrawer();
+            }
+        }
+
+        function confirmFilters() {
+            closeFilterDrawer();
+            updateSelectedTagChips();
+            document.getElementById('aiSearchInput').focus();
         }
 
         // 清除筛选
@@ -1166,7 +1400,12 @@
                 item.classList.remove('selected');
             });
             document.getElementById('aiSearchInput').value = '';
-            renderPersonList();
+            updateSelectedTagChips();
+            if (viewMode === 'results') {
+                selectedPersons.clear();
+                currentPage = 1;
+                renderPersonList();
+            }
         }
 
         function addItem() {
@@ -1175,31 +1414,44 @@
 
         // 应用筛选
         function applyFilters() {
-            currentPage = 1;
-            renderPersonList();
+            aiSearch();
         }
 
         // AI搜索
         function aiSearch() {
-            const query = document.getElementById('aiSearchInput').value;
-            if (!query.trim()) return;
-            
-            alert(`正在使用AI分析查询："${query}"\n\n此功能需要对接我行AI能力，对人力系统已有员工数据进行训练后使用。`);
-            selectedTags = [];
-            document.querySelectorAll('.tag-item').forEach(item => {
-                item.classList.remove('selected');
-            });
+            closeFilterDrawer();
+            setViewMode('results');
             renderPersonList();
         }
 
         // 筛选人员数据
         function filterPersons() {
-            if (selectedTags.length === 0) {
-                return personData;
+            const query = (document.getElementById('aiSearchInput')?.value || '').trim().toLowerCase();
+            let data = personData;
+            if (selectedTags.length > 0) {
+                data = data.filter(person => selectedTags.some(tag => person.tags.includes(tag)));
             }
-            return personData.filter(person => {
-                return selectedTags.some(tag => person.tags.includes(tag));
-            });
+            if (query) {
+                data = data.filter(person => {
+                    const haystack = [
+                        person.empNo,
+                        person.name,
+                        person.unit,
+                        person.department,
+                        person.office,
+                        person.position,
+                        person.gender,
+                        String(person.age),
+                        person.education,
+                        person.marital,
+                        person.empType,
+                        person.political,
+                        ...(person.tags || [])
+                    ].join(' ').toLowerCase();
+                    return haystack.includes(query);
+                });
+            }
+            return data;
         }
 
         // 渲染人员列表
@@ -1429,7 +1681,13 @@
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             initTagPanel();
-            renderPersonList();
+            updateSelectedTagChips();
+            setViewMode('landing');
+            document.getElementById('aiSearchInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    aiSearch();
+                }
+            });
         });
     </script>
 </body>
