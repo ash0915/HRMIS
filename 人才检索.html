@@ -1014,14 +1014,14 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 10px;
-            max-width: 320px;
+            max-width: 260px;
         }
 
         .basic-item {
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 10px;
+            gap: 8px;
             padding: 6px 0;
             border-bottom: 1px dashed #f0f0f0;
         }
@@ -1034,7 +1034,7 @@
             font-size: 12px;
             color: #98a2b3;
             flex-shrink: 0;
-            width: 44px;
+            width: 40px;
         }
 
         .basic-value {
@@ -1074,6 +1074,19 @@
             min-width: 360px;
         }
 
+        .dimension-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        #compareDimChips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
         .dimension-chip {
             padding: 10px 12px;
             background: #f5f7fa;
@@ -1081,11 +1094,49 @@
             border-radius: 10px;
             font-size: 12px;
             color: #344054;
-            width: fit-content;
             max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .compare-summary .dimension-chip {
+            width: auto;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: #fff;
+        }
+
+        .dimension-chip-remove {
+            width: 18px;
+            height: 18px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            background: rgba(102, 112, 133, 0.15);
+            color: #667085;
+            font-size: 14px;
+            line-height: 18px;
+            padding: 0;
+        }
+
+        .dimension-performance {
+            justify-content: flex-start;
+        }
+
+        .dimension-performance svg {
+            width: 140px;
+            height: 28px;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .dimension-performance .perf-value {
+            font-weight: 600;
+            color: #1e3a5f;
+            flex-shrink: 0;
         }
 
         .compare-dim-select {
@@ -1254,6 +1305,10 @@
             }
 
             .card-basic {
+                grid-template-columns: 1fr;
+            }
+
+            .dimension-row {
                 grid-template-columns: 1fr;
             }
         }
@@ -1460,18 +1515,18 @@
 
         // 人员数据
         const personData = [
-            { id: 1, empNo: 'G001', name: '张军', unit: '总行', department: '集团总部', office: '董事会办公室', position: '董事长', gender: '男', age: 38, education: '博士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20headshot%20portrait%20of%20a%20Chinese%20male%20bank%20executive%2C%20business%20suit%2C%20neutral%20studio%20background%2C%20soft%20lighting%2C%20high%20detail%2C%20photorealistic&image_size=square', tags: ['对公', '985', '85后', '博士', '工龄_5年以上', '入行_5年以上', '校园招聘', '正式员工', '中共党员'], isCadre: true },
-            { id: 2, empNo: 'G002', name: '李明', unit: '总行', department: '人力资源部', office: '干部管理处', position: '处长', gender: '男', age: 42, education: '硕士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=photorealistic%20portrait%20of%20a%20Chinese%20male%20HR%20manager%2C%20business%20attire%2C%20clean%20white%20background%2C%20soft%20natural%20light%2C%20headshot%2C%20high%20detail&image_size=square', tags: ['风险管理', '211', '80后', '硕士', '工龄_5年以上', '入行_5年以上', '社会招聘', '正式员工', '中共党员'], isCadre: true },
-            { id: 3, empNo: 'G003', name: '王芳', unit: '上海分行', department: '公司业务部', office: '大客户中心', position: '总经理', gender: '女', age: 35, education: '硕士研究生', marital: '未婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20headshot%20portrait%20of%20a%20Chinese%20female%20bank%20general%20manager%2C%20professional%20blazer%2C%20neutral%20studio%20background%2C%20soft%20lighting%2C%20photorealistic%2C%20high%20detail&image_size=square', tags: ['对公', '211', '85后', '硕士', '工龄_5年以上', '入行_5年以上', '外部引进', '正式员工', '中共党员'], isCadre: true },
-            { id: 4, empNo: 'G004', name: '陈伟', unit: '北京分行', department: '风险管理部', office: '信用审批处', position: '副处长', gender: '男', age: 32, education: '博士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=photorealistic%20portrait%20of%20a%20Chinese%20male%20risk%20management%20director%2C%20business%20suit%2C%20modern%20office%20background%20blurred%2C%20soft%20lighting%2C%20headshot%2C%20high%20detail&image_size=square', tags: ['风险管理', '985', '90后', '博士', '工龄_3-5年', '入行_3-5年', '社会招聘', '正式员工', '中共党员'], isCadre: true },
-            { id: 5, empNo: 'G005', name: '刘洋', unit: '深圳分行', department: '金融科技部', office: '开发一部', position: '技术经理', gender: '男', age: 29, education: '本科', marital: '未婚', empType: '正式员工', political: '共青团员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20portrait%20of%20a%20Chinese%20male%20fintech%20engineer%2C%20smart%20casual%2C%20clean%20studio%20background%2C%20soft%20lighting%2C%20photorealistic%2C%20headshot&image_size=square', tags: ['金融科技', '普通高校', '95后', '本科', '工龄_1-3年', '入行_1-3年', '校园招聘', '正式员工', '共青团员'], isCadre: false },
-            { id: 6, empNo: 'G006', name: '赵静', unit: '总行', department: '财务部', office: '预算管理处', position: '主管', gender: '女', age: 31, education: '硕士研究生', marital: '已婚', empType: '派遣员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=photorealistic%20portrait%20of%20a%20Chinese%20female%20bank%20finance%20supervisor%2C%20professional%20attire%2C%20neutral%20background%2C%20soft%20lighting%2C%20headshot%2C%20high%20detail&image_size=square', tags: ['运营', '普通高校', '90后', '硕士', '工龄_3-5年', '入行_3-5年', '校园招聘', '派遣员工', '中共党员'], isCadre: false },
-            { id: 7, empNo: 'G007', name: '孙磊', unit: '广州分行', department: '零售业务部', office: '个人信贷处', position: '经理', gender: '男', age: 36, education: '本科', marital: '已婚', empType: '正式员工', political: '中共党员', tags: ['零售', '211', '85后', '本科', '工龄_5年以上', '入行_5年以上', '内部调动', '正式员工', '中共党员'], isCadre: true },
-            { id: 8, empNo: 'G008', name: '周婷', unit: '成都分行', department: '运营管理部', office: '流程优化处', position: '副经理', gender: '女', age: 30, education: '硕士研究生', marital: '未婚', empType: '派遣员工', political: '群众', tags: ['运营', '985', '90后', '硕士', '工龄_1-3年', '入行_1-3年', '校园招聘', '派遣员工', '群众'], isCadre: false },
-            { id: 9, empNo: 'G009', name: '吴强', unit: '总行', department: '战略规划部', office: '规划研究处', position: '研究员', gender: '男', age: 33, education: '博士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', tags: ['资产管理', '985', '90后', '博士', '工龄_3-5年', '入行_3-5年', '外部引进', '正式员工', '中共党员'], isCadre: true },
-            { id: 10, empNo: 'G010', name: '郑洁', unit: '杭州分行', department: '营业部', office: '客户服务中心', position: '主任', gender: '女', age: 34, education: '本科', marital: '已婚', empType: '正式员工', political: '中共党员', tags: ['零售', '普通高校', '85后', '本科', '工龄_5年以上', '入行_5年以上', '社会招聘', '正式员工', '中共党员'], isCadre: true },
-            { id: 11, empNo: 'G011', name: '黄伟', unit: '南京分行', department: '投资银行部', office: '并购重组处', position: '高级经理', gender: '男', age: 37, education: '硕士研究生', marital: '已婚', empType: '返聘员工', political: '中共党员', tags: ['投行', '211', '85后', '硕士', '工龄_5年以上', '入行_5年以上', '社会招聘', '返聘员工', '中共党员'], isCadre: false },
-            { id: 12, empNo: 'G012', name: '林娜', unit: '武汉分行', department: '人力资源部', office: '培训中心', position: '培训师', gender: '女', age: 28, education: '硕士研究生', marital: '未婚', empType: '实习生', political: '共青团员', tags: ['对公', '普通高校', '95后', '硕士', '工龄_1年以下', '入行_1年以下', '校园招聘', '实习生', '共青团员'], isCadre: false }
+            { id: 1, empNo: 'G001', name: '张军', unit: '总行', department: '集团总部', office: '董事会办公室', position: '董事长', gender: '男', age: 38, education: '博士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20headshot%20portrait%20of%20a%20Chinese%20male%20bank%20executive%2C%20business%20suit%2C%20neutral%20studio%20background%2C%20soft%20lighting%2C%20high%20detail%2C%20photorealistic&image_size=square', tags: ['对公', '985', '85后', '博士', '工龄_5年以上', '入行_5年以上', '校园招聘', '正式员工', '中共党员'], performance: [82, 85, 84, 88, 90, 92], isCadre: true },
+            { id: 2, empNo: 'G002', name: '李明', unit: '总行', department: '人力资源部', office: '干部管理处', position: '处长', gender: '男', age: 42, education: '硕士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=photorealistic%20portrait%20of%20a%20Chinese%20male%20HR%20manager%2C%20business%20attire%2C%20clean%20white%20background%2C%20soft%20natural%20light%2C%20headshot%2C%20high%20detail&image_size=square', tags: ['风险管理', '211', '80后', '硕士', '工龄_5年以上', '入行_5年以上', '社会招聘', '正式员工', '中共党员'], performance: [78, 80, 82, 81, 83, 85], isCadre: true },
+            { id: 3, empNo: 'G003', name: '王芳', unit: '上海分行', department: '公司业务部', office: '大客户中心', position: '总经理', gender: '女', age: 35, education: '硕士研究生', marital: '未婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20headshot%20portrait%20of%20a%20Chinese%20female%20bank%20general%20manager%2C%20professional%20blazer%2C%20neutral%20studio%20background%2C%20soft%20lighting%2C%20photorealistic%2C%20high%20detail&image_size=square', tags: ['对公', '211', '85后', '硕士', '工龄_5年以上', '入行_5年以上', '外部引进', '正式员工', '中共党员'], performance: [75, 79, 81, 84, 83, 86], isCadre: true },
+            { id: 4, empNo: 'G004', name: '陈伟', unit: '北京分行', department: '风险管理部', office: '信用审批处', position: '副处长', gender: '男', age: 32, education: '博士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=photorealistic%20portrait%20of%20a%20Chinese%20male%20risk%20management%20director%2C%20business%20suit%2C%20modern%20office%20background%20blurred%2C%20soft%20lighting%2C%20headshot%2C%20high%20detail&image_size=square', tags: ['风险管理', '985', '90后', '博士', '工龄_3-5年', '入行_3-5年', '社会招聘', '正式员工', '中共党员'], performance: [80, 82, 85, 86, 88, 87], isCadre: true },
+            { id: 5, empNo: 'G005', name: '刘洋', unit: '深圳分行', department: '金融科技部', office: '开发一部', position: '技术经理', gender: '男', age: 29, education: '本科', marital: '未婚', empType: '正式员工', political: '共青团员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20portrait%20of%20a%20Chinese%20male%20fintech%20engineer%2C%20smart%20casual%2C%20clean%20studio%20background%2C%20soft%20lighting%2C%20photorealistic%2C%20headshot&image_size=square', tags: ['金融科技', '普通高校', '95后', '本科', '工龄_1-3年', '入行_1-3年', '校园招聘', '正式员工', '共青团员'], performance: [72, 75, 78, 82, 85, 86], isCadre: false },
+            { id: 6, empNo: 'G006', name: '赵静', unit: '总行', department: '财务部', office: '预算管理处', position: '主管', gender: '女', age: 31, education: '硕士研究生', marital: '已婚', empType: '派遣员工', political: '中共党员', avatarUrl: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=photorealistic%20portrait%20of%20a%20Chinese%20female%20bank%20finance%20supervisor%2C%20professional%20attire%2C%20neutral%20background%2C%20soft%20lighting%2C%20headshot%2C%20high%20detail&image_size=square', tags: ['运营', '普通高校', '90后', '硕士', '工龄_3-5年', '入行_3-5年', '校园招聘', '派遣员工', '中共党员'], performance: [76, 78, 77, 79, 81, 83], isCadre: false },
+            { id: 7, empNo: 'G007', name: '孙磊', unit: '广州分行', department: '零售业务部', office: '个人信贷处', position: '经理', gender: '男', age: 36, education: '本科', marital: '已婚', empType: '正式员工', political: '中共党员', tags: ['零售', '211', '85后', '本科', '工龄_5年以上', '入行_5年以上', '内部调动', '正式员工', '中共党员'], performance: [79, 80, 82, 84, 86, 85], isCadre: true },
+            { id: 8, empNo: 'G008', name: '周婷', unit: '成都分行', department: '运营管理部', office: '流程优化处', position: '副经理', gender: '女', age: 30, education: '硕士研究生', marital: '未婚', empType: '派遣员工', political: '群众', tags: ['运营', '985', '90后', '硕士', '工龄_1-3年', '入行_1-3年', '校园招聘', '派遣员工', '群众'], performance: [70, 72, 74, 76, 78, 80], isCadre: false },
+            { id: 9, empNo: 'G009', name: '吴强', unit: '总行', department: '战略规划部', office: '规划研究处', position: '研究员', gender: '男', age: 33, education: '博士研究生', marital: '已婚', empType: '正式员工', political: '中共党员', tags: ['资产管理', '985', '90后', '博士', '工龄_3-5年', '入行_3-5年', '外部引进', '正式员工', '中共党员'], performance: [83, 84, 86, 87, 89, 91], isCadre: true },
+            { id: 10, empNo: 'G010', name: '郑洁', unit: '杭州分行', department: '营业部', office: '客户服务中心', position: '主任', gender: '女', age: 34, education: '本科', marital: '已婚', empType: '正式员工', political: '中共党员', tags: ['零售', '普通高校', '85后', '本科', '工龄_5年以上', '入行_5年以上', '社会招聘', '正式员工', '中共党员'], performance: [77, 79, 81, 82, 83, 84], isCadre: true },
+            { id: 11, empNo: 'G011', name: '黄伟', unit: '南京分行', department: '投资银行部', office: '并购重组处', position: '高级经理', gender: '男', age: 37, education: '硕士研究生', marital: '已婚', empType: '返聘员工', political: '中共党员', tags: ['投行', '211', '85后', '硕士', '工龄_5年以上', '入行_5年以上', '社会招聘', '返聘员工', '中共党员'], performance: [81, 80, 82, 84, 83, 85], isCadre: false },
+            { id: 12, empNo: 'G012', name: '林娜', unit: '武汉分行', department: '人力资源部', office: '培训中心', position: '培训师', gender: '女', age: 28, education: '硕士研究生', marital: '未婚', empType: '实习生', political: '共青团员', tags: ['对公', '普通高校', '95后', '硕士', '工龄_1年以下', '入行_1年以下', '校园招聘', '实习生', '共青团员'], performance: [68, 70, 72, 75, 78, 80], isCadre: false }
         ];
 
         let currentPage = 1;
@@ -1618,6 +1673,12 @@
 
         let selectedCompareDims = new Set();
 
+        function removeCompareDim(dim) {
+            selectedCompareDims.delete(dim);
+            showCompareResults();
+            renderCompareCards();
+        }
+
         function initCompareDimPanel() {
             const grid = document.getElementById('compareDimGrid');
             grid.innerHTML = '';
@@ -1669,7 +1730,15 @@
             Array.from(selectedCompareDims).forEach(dim => {
                 const chip = document.createElement('span');
                 chip.className = 'dimension-chip';
-                chip.textContent = dim;
+                const text = document.createElement('span');
+                text.textContent = dim;
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'dimension-chip-remove';
+                remove.textContent = '×';
+                remove.onclick = () => removeCompareDim(dim);
+                chip.appendChild(text);
+                chip.appendChild(remove);
                 chips.appendChild(chip);
             });
         }
@@ -1683,15 +1752,65 @@
             renderCompareCards();
         }
 
+        function renderSparkline(values) {
+            const data = Array.isArray(values) ? values.filter(v => typeof v === 'number' && !Number.isNaN(v)) : [];
+            if (data.length < 2) return '';
+
+            const w = 140;
+            const h = 28;
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const denom = (max - min) || 1;
+
+            const points = data.map((v, i) => {
+                const x = (w - 2) * (i / (data.length - 1)) + 1;
+                const y = h - ((h - 2) * ((v - min) / denom) + 1);
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            }).join(' ');
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <polyline points="${points}" fill="none" stroke="#2c5c97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                </svg>
+            `;
+        }
+
         function renderCompareDimInfo(person) {
-            const items = [];
+            const map = new Map();
             Array.from(selectedCompareDims).forEach(dim => {
                 let value = '—';
+                let html = '';
                 if (dim === '学历') value = person.education;
                 if (dim === '政治面貌') value = person.political;
-                items.push(`${dim}：${value}`);
+                if (dim === '绩效') {
+                    const spark = renderSparkline(person.performance);
+                    const last = Array.isArray(person.performance) && person.performance.length ? person.performance[person.performance.length - 1] : null;
+                    html = `${spark}<span class="perf-value">${last ?? '—'}</span>`;
+                }
+                map.set(dim, { value, html });
             });
-            return items.map(t => `<span class="dimension-chip">${t}</span>`).join('');
+
+            const renderTextChip = (dim, value) => `<span class="dimension-chip"><span>${dim}：</span><span>${value}</span></span>`;
+            const renderPerfChip = (dim, html) => `<span class="dimension-chip dimension-performance"><span>${dim}：</span>${html || '<span>—</span>'}</span>`;
+
+            const blocks = [];
+            const a = map.get('履历（行内）');
+            const b = map.get('履历（行外）');
+            if (a || b) {
+                blocks.push(`<div class="dimension-row">${a ? renderTextChip('履历（行内）', a.value) : ''}${b ? renderTextChip('履历（行外）', b.value) : ''}</div>`);
+                map.delete('履历（行内）');
+                map.delete('履历（行外）');
+            }
+
+            map.forEach((v, dim) => {
+                if (dim === '绩效') {
+                    blocks.push(renderPerfChip(dim, v.html));
+                } else {
+                    blocks.push(renderTextChip(dim, v.value));
+                }
+            });
+
+            return blocks.join('');
         }
 
         function renderTagCloud(tags) {
