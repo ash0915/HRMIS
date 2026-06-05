@@ -920,8 +920,25 @@
 
         .card-header {
             padding: 16px;
-            text-align: center;
             border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .card-left {
+            width: 120px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .avatar-cloud {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
         }
 
         .card-avatar {
@@ -935,8 +952,10 @@
             color: #fff;
             font-size: 32px;
             font-weight: 600;
-            margin: 0 auto 12px;
             overflow: hidden;
+            position: absolute;
+            top: 10px;
+            left: 10px;
         }
 
         .card-avatar img {
@@ -947,27 +966,192 @@
             display: block;
         }
 
+        .tag-cloud {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .tag-cloud span {
+            position: absolute;
+            padding: 3px 8px;
+            background: rgba(230, 240, 255, 0.95);
+            color: #2c5c97;
+            border-radius: 999px;
+            font-size: 11px;
+            line-height: 1;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
         .card-name {
             font-size: 18px;
             font-weight: 600;
             color: #333;
+            text-align: center;
         }
 
         .card-position {
             font-size: 12px;
             color: #999;
             margin-top: 4px;
+            text-align: center;
         }
 
-        .card-body {
-            padding: 16px;
+        .card-right {
+            flex: 1;
+            min-width: 0;
         }
+
+        .card-basic {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+        }
+
+        .basic-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+
+        .basic-item:last-child {
+            border-bottom: none;
+        }
+
+        .basic-label {
+            font-size: 12px;
+            color: #98a2b3;
+            flex-shrink: 0;
+        }
+
+        .basic-value {
+            font-size: 12px;
+            color: #333;
+            font-weight: 500;
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .compare-dimensions {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .dimension-chip {
+            padding: 4px 10px;
+            background: #f5f7fa;
+            border: 1px solid #e6e6e6;
+            border-radius: 999px;
+            font-size: 12px;
+            color: #344054;
+        }
+
+        .compare-dim-select {
+            padding: 8px 0 4px;
+        }
+
+        .compare-dim-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1e3a5f;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .compare-dim-desc {
+            font-size: 13px;
+            color: #667085;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .compare-dim-grid {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .dim-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border: 1px solid #e6e6e6;
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .dim-option input {
+            width: 16px;
+            height: 16px;
+        }
+
+        .dim-option span {
+            font-size: 13px;
+            color: #344054;
+        }
+
+        .compare-dim-actions {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .compare-summary {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .compare-summary-left {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .compare-summary-title {
+            font-size: 13px;
+            color: #667085;
+        }
+
+        .compare-back {
+            padding: 6px 10px;
+            border: 1px solid #e6e6e6;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #344054;
+            flex-shrink: 0;
+        }
+
+        .compare-back:hover {
+            background: #f5f7fa;
+        }
+
 
         .info-row {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px dashed #f0f0f0;
         }
 
         .info-row:last-child {
@@ -983,31 +1167,6 @@
             font-size: 12px;
             color: #333;
             font-weight: 500;
-        }
-
-        .card-tags {
-            margin-top: 16px;
-        }
-
-        .card-tags .section-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .card-tag-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        .card-tag {
-            padding: 3px 8px;
-            background: #e6f0ff;
-            color: #2c5c97;
-            border-radius: 8px;
-            font-size: 11px;
         }
 
         /* 响应式设计 */
@@ -1043,6 +1202,35 @@
 
             .compare-card {
                 flex: 1;
+            }
+
+            .compare-dim-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .card-left {
+                width: 100%;
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 12px;
+            }
+
+            .avatar-cloud {
+                margin-bottom: 0;
+            }
+
+            .card-name,
+            .card-position {
+                text-align: left;
+            }
+
+            .card-basic {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1179,7 +1367,25 @@
                 <span class="modal-close" onclick="closeCompareModal()">&times;</span>
             </div>
             <div class="compare-modal-body">
-                <div class="compare-cards" id="compareCards">
+                <div class="compare-dim-select" id="compareDimSelect">
+                    <div class="compare-dim-title">请选择对比维度</div>
+                    <div class="compare-dim-desc">勾选你关心的维度，我们将按所选维度展示人才对比信息。</div>
+                    <div class="compare-dim-grid" id="compareDimGrid"></div>
+                    <div class="compare-dim-actions">
+                        <button class="btn btn-secondary" onclick="resetCompareDims()">重置</button>
+                        <button class="btn btn-primary" onclick="confirmCompareDims()">开始对比</button>
+                    </div>
+                </div>
+
+                <div class="compare-summary" id="compareSummary">
+                    <div class="compare-summary-left">
+                        <div class="compare-summary-title">已选维度</div>
+                        <div id="compareDimChips"></div>
+                    </div>
+                    <button class="compare-back" onclick="backToDimSelect()">重新选择</button>
+                </div>
+
+                <div class="compare-cards" id="compareCards" style="display:none;">
                     <!-- 对比卡片将通过JS动态生成 -->
                 </div>
             </div>
@@ -1342,6 +1548,132 @@
             return String(tag)
                 .replace(/^工龄[:：_]/, '')
                 .replace(/^入行[:：_]/, '');
+        }
+
+        function getCompareTagText(tag) {
+            const str = String(tag);
+            if (str.startsWith('工龄_')) {
+                return `工龄：${str.replace(/^工龄_/, '')}`;
+            }
+            if (str.startsWith('入行_')) {
+                return `入行：${str.replace(/^入行_/, '')}`;
+            }
+            return str;
+        }
+
+        function getTagCloudStyle(index) {
+            const styles = [
+                'top:8%;left:50%;',
+                'top:20%;left:12%;',
+                'top:20%;left:88%;',
+                'top:48%;left:5%;',
+                'top:48%;left:95%;',
+                'top:78%;left:18%;',
+                'top:78%;left:82%;',
+                'top:94%;left:50%;',
+                'top:34%;left:28%;',
+                'top:34%;left:72%;'
+            ];
+            return styles[index % styles.length];
+        }
+
+        const compareDimensions = [
+            '职称',
+            '证书',
+            '学历',
+            '履历（行内）',
+            '履历（行外）',
+            '培训资质',
+            '考核结果',
+            '绩效',
+            '政治面貌'
+        ];
+
+        let selectedCompareDims = new Set();
+
+        function initCompareDimPanel() {
+            const grid = document.getElementById('compareDimGrid');
+            grid.innerHTML = '';
+            compareDimensions.forEach(dim => {
+                const label = document.createElement('label');
+                label.className = 'dim-option';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.value = dim;
+                input.checked = selectedCompareDims.size === 0 ? (dim === '学历' || dim === '政治面貌') : selectedCompareDims.has(dim);
+                input.onchange = () => {
+                    if (input.checked) {
+                        selectedCompareDims.add(dim);
+                    } else {
+                        selectedCompareDims.delete(dim);
+                    }
+                };
+                const span = document.createElement('span');
+                span.textContent = dim;
+                label.appendChild(input);
+                label.appendChild(span);
+                grid.appendChild(label);
+            });
+
+            if (selectedCompareDims.size === 0) {
+                selectedCompareDims.add('学历');
+                selectedCompareDims.add('政治面貌');
+            }
+        }
+
+        function resetCompareDims() {
+            selectedCompareDims = new Set(['学历', '政治面貌']);
+            initCompareDimPanel();
+        }
+
+        function showDimSelect() {
+            document.getElementById('compareDimSelect').style.display = 'block';
+            document.getElementById('compareCards').style.display = 'none';
+            document.getElementById('compareSummary').style.display = 'none';
+        }
+
+        function showCompareResults() {
+            document.getElementById('compareDimSelect').style.display = 'none';
+            document.getElementById('compareCards').style.display = 'flex';
+            document.getElementById('compareSummary').style.display = 'flex';
+
+            const chips = document.getElementById('compareDimChips');
+            chips.innerHTML = '';
+            Array.from(selectedCompareDims).forEach(dim => {
+                const chip = document.createElement('span');
+                chip.className = 'dimension-chip';
+                chip.textContent = dim;
+                chips.appendChild(chip);
+            });
+        }
+
+        function backToDimSelect() {
+            showDimSelect();
+        }
+
+        function confirmCompareDims() {
+            showCompareResults();
+            renderCompareCards();
+        }
+
+        function renderCompareDimInfo(person) {
+            const items = [];
+            Array.from(selectedCompareDims).forEach(dim => {
+                let value = '—';
+                if (dim === '学历') value = person.education;
+                if (dim === '政治面貌') value = person.political;
+                items.push(`${dim}：${value}`);
+            });
+            return items.map(t => `<span class="dimension-chip">${t}</span>`).join('');
+        }
+
+        function renderTagCloud(tags) {
+            const list = (tags || []).slice(0, 10);
+            return `
+                <div class="tag-cloud">
+                    ${list.map((t, i) => `<span style="${getTagCloudStyle(i)}">${getCompareTagText(t)}</span>`).join('')}
+                </div>
+            `;
         }
 
         function updateSelectedTagChips() {
@@ -1638,9 +1970,15 @@
         // 打开人才对比弹窗
         function openCompareModal() {
             const modal = document.getElementById('compareModal');
+            initCompareDimPanel();
+            showDimSelect();
+            modal.classList.add('show');
+        }
+
+        function renderCompareCards() {
             const cardsContainer = document.getElementById('compareCards');
             cardsContainer.innerHTML = '';
-            
+
             selectedPersons.forEach(id => {
                 const person = personData.find(p => p.id === id);
                 if (person) {
@@ -1649,30 +1987,30 @@
                     const avatarHtml = person.avatarUrl ? `<img src="${person.avatarUrl}" alt="${person.name}" />` : person.name.charAt(0);
                     card.innerHTML = `
                         <div class="card-header">
-                            <div class="card-avatar">${avatarHtml}</div>
-                            <div class="card-name">${person.name}</div>
-                            <div class="card-position">${person.position}</div>
-                        </div>
-                        <div class="card-body">
-                            <div class="info-row"><span class="info-label">单位</span><span class="info-value">${person.unit}</span></div>
-                            <div class="info-row"><span class="info-label">部门</span><span class="info-value">${person.department}</span></div>
-                            <div class="info-row"><span class="info-label">部室</span><span class="info-value">${person.office}</span></div>
-                            <div class="info-row"><span class="info-label">性别</span><span class="info-value">${person.gender}</span></div>
-                            <div class="info-row"><span class="info-label">年龄</span><span class="info-value">${person.age}</span></div>
-                            <div class="info-row"><span class="info-label">学历</span><span class="info-value">${person.education}</span></div>
-                            <div class="info-row"><span class="info-label">员工类别</span><span class="info-value">${person.empType}</span></div>
-                            <div class="info-row"><span class="info-label">政治面貌</span><span class="info-value">${person.political}</span></div>
-                            <div class="card-tags">
-                                <div class="section-title">标签</div>
-                                <div class="card-tag-list">${person.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+                            <div class="card-left">
+                                <div class="avatar-cloud">
+                                    ${renderTagCloud(person.tags)}
+                                    <div class="card-avatar">${avatarHtml}</div>
+                                </div>
+                                <div class="card-name">${person.name}</div>
+                                <div class="card-position">${person.position}</div>
+                            </div>
+                            <div class="card-right">
+                                <div class="card-basic">
+                                    <div class="basic-item"><span class="basic-label">单位</span><span class="basic-value">${person.unit}</span></div>
+                                    <div class="basic-item"><span class="basic-label">部门</span><span class="basic-value">${person.department}</span></div>
+                                    <div class="basic-item"><span class="basic-label">性别</span><span class="basic-value">${person.gender}</span></div>
+                                    <div class="basic-item"><span class="basic-label">年龄</span><span class="basic-value">${person.age}</span></div>
+                                </div>
+                                <div class="compare-dimensions">
+                                    ${renderCompareDimInfo(person)}
+                                </div>
                             </div>
                         </div>
                     `;
                     cardsContainer.appendChild(card);
                 }
             });
-            
-            modal.classList.add('show');
         }
 
         // 关闭对比弹窗
