@@ -334,12 +334,21 @@
             background: #e8eaed;
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #1e874b 100%);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
         /* 右侧内容区 */
         .right-panel {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #f5f7fa;
+            background: #fff;
             min-width: 0;
             transition: width 0.3s ease;
         }
@@ -348,7 +357,7 @@
         .search-header {
             background: #fff;
             padding: 20px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: none;
         }
 
         .ai-search-container {
@@ -902,6 +911,7 @@
             
             <div class="search-action">
                 <button class="btn btn-secondary" onclick="clearFilters()">清除筛选</button>
+                <button class="btn btn-success" onclick="addItem()">添加</button>
                 <button class="btn btn-primary" onclick="applyFilters()">检索</button>
             </div>
         </div>
@@ -1045,10 +1055,6 @@
                 tags: ['高级奖励获得者', '中级奖励获得者', '初级奖励获得者']
             },
             {
-                name: '特殊贡献',
-                tags: ['特殊贡献']
-            },
-            {
                 name: '年龄阶段',
                 tags: ['80后', '85后', '90后', '95后']
             },
@@ -1161,6 +1167,10 @@
             });
             document.getElementById('aiSearchInput').value = '';
             renderPersonList();
+        }
+
+        function addItem() {
+            alert('添加功能需对接业务系统后启用。');
         }
 
         // 应用筛选
