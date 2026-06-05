@@ -360,6 +360,13 @@
             border-bottom: none;
         }
 
+        .search-header.landing-mode {
+            min-height: calc(100vh - 56px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
         .landing-hero {
             text-align: center;
             padding: 28px 0 10px;
@@ -884,9 +891,27 @@
             align-items: center;
         }
 
+        .compare-modal-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .compare-modal-header h3 {
             font-size: 16px;
             font-weight: 600;
+        }
+
+        .modal-expand {
+            font-size: 18px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            user-select: none;
+        }
+
+        .modal-expand:hover {
+            color: #2c5c97;
         }
 
         .modal-close {
@@ -894,6 +919,14 @@
             color: #999;
             cursor: pointer;
             line-height: 1;
+        }
+
+        .compare-modal.fullscreen {
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+            max-height: 100vh;
+            border-radius: 0;
         }
 
         .compare-modal-body {
@@ -1074,13 +1107,6 @@
             min-width: 360px;
         }
 
-        .dimension-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            width: 100%;
-        }
-
         #compareDimChips {
             display: flex;
             flex-wrap: wrap;
@@ -1100,6 +1126,9 @@
             justify-content: flex-start;
             gap: 4px;
             width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .dimension-chip span:first-child {
@@ -1306,9 +1335,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .dimension-row {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -1441,7 +1467,10 @@
         <div class="compare-modal">
             <div class="compare-modal-header">
                 <h3>人才对比分析</h3>
-                <span class="modal-close" onclick="closeCompareModal()">&times;</span>
+                <div class="compare-modal-header-actions">
+                    <span class="modal-expand" onclick="toggleCompareFullscreen()">⛶</span>
+                    <span class="modal-close" onclick="closeCompareModal()">&times;</span>
+                </div>
             </div>
             <div class="compare-modal-body">
                 <div class="compare-dim-select" id="compareDimSelect">
@@ -1537,14 +1566,17 @@
             const hero = document.getElementById('landingHero');
             const results = document.getElementById('resultsView');
             const hint = document.getElementById('aiHint');
+            const header = document.querySelector('.search-header');
             if (mode === 'results') {
                 hero.style.display = 'none';
                 results.style.display = 'flex';
                 hint.style.display = 'none';
+                header.classList.remove('landing-mode');
             } else {
                 hero.style.display = 'block';
                 results.style.display = 'none';
                 hint.style.display = 'block';
+                header.classList.add('landing-mode');
             }
         }
 
@@ -1760,16 +1792,7 @@
         }
 
         function renderPerformanceYearly(records) {
-            const list = Array.isArray(records) ? records : [];
-            const top = list.slice(0, 2);
-            if (top.length === 0) {
-                return '<span>—</span>';
-            }
-            return `
-                <span class="perf-lines">
-                    ${top.map(r => `<span>${r.year} ${r.score}</span>`).join('')}
-                </span>
-            `;
+            return '<span>——</span>';
         }
 
         function renderCompareDimInfo(person) {
@@ -1789,14 +1812,6 @@
             const renderPerfChip = (dim, html) => `<span class="dimension-chip"><span>${dim}：</span>${html || '<span>—</span>'}</span>`;
 
             const blocks = [];
-            const a = map.get('履历（行内）');
-            const b = map.get('履历（行外）');
-            if (a || b) {
-                blocks.push(`<div class="dimension-row">${a ? renderTextChip('履历（行内）', a.value) : ''}${b ? renderTextChip('履历（行外）', b.value) : ''}</div>`);
-                map.delete('履历（行内）');
-                map.delete('履历（行外）');
-            }
-
             map.forEach((v, dim) => {
                 if (dim === '绩效') {
                     blocks.push(renderPerfChip(dim, v.html));
@@ -2123,6 +2138,23 @@
             initCompareDimPanel();
             showDimSelect();
             modal.classList.add('show');
+        }
+
+        function toggleCompareFullscreen() {
+            const modal = document.querySelector('.compare-modal');
+            if (!document.fullscreenElement) {
+                if (modal && modal.requestFullscreen) {
+                    modal.requestFullscreen();
+                    modal.classList.add('fullscreen');
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                if (modal) {
+                    modal.classList.remove('fullscreen');
+                }
+            }
         }
 
         function renderCompareCards() {
